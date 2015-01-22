@@ -1,0 +1,363 @@
+/*
+ * Welcome to the RiceBot library!
+ *
+ * This library was written for use by the Rice University Vex U Robotics team.
+ * All are welcome to use and modify the library, so long as due credit is given to the creator.
+ * If you have questions/comments/suggestions, email me at Keiko.F.Kaplan@rice.edu
+ *
+ * This library was written to be used with the Purdue Robotic Operating System.
+ *
+ * Author: Keiko Kaplan
+ */
+
+#include "main.h"
+
+/*
+ * Initializes a Motor type
+ *
+ * @param port The port on the Cortex which the motor is plugged into
+ * @param reflected If the output to the motor should be reversed. -1 or 1
+ *
+ * @return The initialized and configured motor
+ */
+Motor initMotor(unsigned char port, int reflected) {
+	Motor *m = malloc(sizeof(Motor));
+	m->port = port;
+	m->out = 0;
+	m->reflected = reflected;
+	return *m;
+}
+
+/*
+ * Initializes a Pid type
+ *
+ * @param kP The coefficient for the proportional term
+ * @param kI The coefficient for the integral term
+ * @param kD The coefficient for the derivative term
+ *
+ * @return The initialized and configured Pid
+ */
+Pid initPid(float kP, float kI, float kD) {
+	Pid *p = malloc(sizeof(Pid));
+	p->running = 0;
+	p->setPoint = 0;
+	p->current = 0;
+	p->error = 0;
+	p->lastError = 0;
+	p->integral = 0;
+	p->derivative = 0;
+	p->kP = kP;
+	p->kI = kI;
+	p->kD = kD;
+	p->output = 0;
+	return *p;
+}
+
+/*
+ * The Ricencoder contains data for either an IME or a quadrature encoder
+ *
+ * @param ticksPerRev The number of ticks per revolution of the encoder
+ * 						627.2 for the 393 IME in high torque mode (factory default)
+ * 						392 for the 393 IME in high speed mode
+ * 						360 for the Quadrature Encoder
+ * @param mult A multiplier to use as compensation for gear ratio
+ * @param isIME 1 if IME, 0 if quad encoder
+ * @param portTop (If not IME) The port on the Cortex which the top wire of the encoder is plugged into
+ * @param portBot (If not IME) The port on the Cortex which the bottom wire of the encoder is plugged into
+ *
+ * @return The initialized and configured Ricencoder
+ */
+Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME,
+		unsigned char portTop, unsigned char portBot, Encoder *enc, bool reverse) {
+	Ricencoder *r = malloc(sizeof(Ricencoder));
+	r->value = 0;
+	r->ticksPerRev = ticksPerRev;
+	r->mult = mult;
+	r->isIME = isIME;
+	r->portTop = portTop;
+	r->portBot = portBot;
+	if(!isIME) {
+		*enc = encoderInit(portTop, portBot, reverse);
+	}
+	return *r;
+}
+
+/*
+ * Initializes a Ricepot
+ *
+ * @param port The port on the Cortex which the potentiometer is plugged into
+ *
+ * @return The initialized and configured Ricepot
+ */
+Ricepot initRicepot(unsigned char port) {
+	analogCalibrate(port);
+	Ricepot *r = malloc(sizeof(Ricepot));
+	r->port = port;
+	r->value = 0;
+	return *r;
+}
+
+void riceBotInitializeIO() {
+
+}
+
+/*
+ * Call this from the default Initialize function.
+ * After, be sure to reinitialize each motor you will be using on your robot.
+ */
+void riceBotInitialize() {
+
+	ENCDTLeft = encoderInit(0, 0, false);
+	ENCDTRight = encoderInit(0, 0, false);
+	ENCARMLeft = encoderInit(0, 0, false);
+	ENCARMRight = encoderInit(0, 0, false);
+
+}
+
+/*
+ * Checks joystick input and sets all Motor structs to appropriate output
+ * @param controlStyle The format of the joystick input.
+ * 			Can be:
+ * 		 			TANKDRIVE
+ * 	 	 			ARCADEDRIVE
+ *	 	 			CHEEZYDRIVE
+ *	 	 			MECANUMDRIVE
+ *	 	 			HDRIVE
+ */
+void getJoystickForDriveTrain() {
+	int x1 = joystickGetAnalog(1, 4);
+	int y1 = joystickGetAnalog(1, 3);
+	int x2 = joystickGetAnalog(1, 1);
+	int y2 = joystickGetAnalog(1, 2);
+
+	switch(controlStyle) {
+	case CTTANKDRIVE:
+		MOTDTFrontLeft.out = y1;
+		MOTDTFrontMidLeft.out = y1;
+		MOTDTMidLeft.out = y1;
+		MOTDTBackLeft.out = y1;
+
+		MOTDTFrontRight.out = y2;
+		MOTDTFrontMidRight.out = y2;
+		MOTDTMidRight.out = y2;
+		MOTDTBackRight.out = y2;
+		break;
+	case CTARCADEDRIVE:
+		MOTDTFrontLeft.out = (y1 + x1) / 2;
+		MOTDTFrontMidLeft.out = (y1 + x1) / 2;
+		MOTDTMidLeft.out = (y1 + x1) / 2;
+		MOTDTBackLeft.out = (y1 + x1) / 2;
+
+		MOTDTFrontRight.out = (y1 - x1) / 2;
+		MOTDTFrontMidRight.out = (y1 - x1) / 2;
+		MOTDTMidRight.out = (y1 - x1) / 2;
+		MOTDTBackRight.out = (y1 - x1) / 2;
+		break;
+	case CTCHEEZYDRIVE:
+		MOTDTFrontLeft.out = (y1 + x2) / 2;
+		MOTDTFrontMidLeft.out = (y1 + x2) / 2;
+		MOTDTMidLeft.out = (y1 + x2) / 2;
+		MOTDTBackLeft.out = (y1 + x2) / 2;
+
+		MOTDTFrontRight.out = (y1 - x2) / 2;
+		MOTDTFrontMidRight.out = (y1 - x2) / 2;
+		MOTDTMidRight.out = (y1 - x2) / 2;
+		MOTDTBackRight.out = (y1 - x2) / 2;
+		break;
+	case CTMECANUMDRIVE:
+		MOTDTFrontLeft.out = y1 + x2 + x1;
+		MOTDTBackLeft.out = y1 + x2 - x1;
+
+		MOTDTFrontRight.out = y1 - x2 - x1;
+		MOTDTBackRight.out = y1 - x2 + x1;
+		break;
+	case CTHDRIVE:
+	default:
+		break;
+	}
+}
+
+/* Final stage: sets all physical motors based on output set in Motor structs
+ * Run in a task?
+ * @param driveTrainStyle The configuration of the wheels on the robot.
+ * 			Can be:
+ * 					FOURWHEELS
+ * 					SIXWHEELS
+ * 					EIGHTWHEELS
+ * 					MECANUM
+ * 					HOLONOMIC
+ * 					HDRIVE
+ * 					SWERVE
+ */
+void setDriveTrainMotors() {
+	switch(driveTrainStyle) {
+	case DTFOURWHEELS:
+		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
+		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
+
+		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
+		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
+		break;
+	case DTSIXWHEELS:
+		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
+		motorSet(MOTDTMidLeft.port, MOTDTMidLeft.out * MOTDTMidLeft.reflected);
+		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
+
+		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
+		motorSet(MOTDTMidRight.port, MOTDTMidRight.out * MOTDTMidRight.reflected);
+		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
+		break;
+	case DTEIGHTWHEELS:
+		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
+		motorSet(MOTDTFrontMidLeft.port, MOTDTFrontMidLeft.out * MOTDTFrontMidLeft.reflected);
+		motorSet(MOTDTMidLeft.port, MOTDTMidLeft.out * MOTDTMidLeft.reflected);
+		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
+
+		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
+		motorSet(MOTDTFrontMidRight.port, MOTDTFrontMidRight.out * MOTDTFrontMidRight.reflected);
+		motorSet(MOTDTMidRight.port, MOTDTMidRight.out * MOTDTMidRight.reflected);
+		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
+		break;
+	default:
+		break;
+	}
+}
+
+void autonomousTask(int instruction, int distance, int pow, long timeout) {
+	int target;
+	long startTime = millis();
+
+	int power[2];
+	power[1] = (pow == NULL) ? 127 : pow;
+	power[0] = power[1];
+
+	switch(instruction) {
+	case AUTODRIVETIME:
+		while(millis() < startTime + timeout) {
+			MOTDTFrontRight.out = power[1];
+			MOTDTFrontMidRight.out = power[1];
+			MOTDTMidRight.out = power[1];
+			MOTDTBackRight.out = power[1];
+			MOTDTFrontLeft.out = power[0];
+			MOTDTFrontMidLeft.out = power[0];
+			MOTDTMidLeft.out = power[0];
+			MOTDTBackLeft.out = power[0];
+		}
+		break;
+	case AUTODRIVEBASIC:
+		target = EncDTLeft.ticksPerRev / (4 * MATH_PI) * distance;
+		//		power = (pow == NULL) ? 127 : pow;
+		int current[2] = {EncDTLeft.value, EncDTRight.value};
+
+		while(current[1] < target && millis() < startTime + timeout) {
+			if(abs(current[1] - current[0]) > 50) {
+				if(current[0] > current[1]) {
+					power[0] = speedRegulator(power[0] - 2);
+				} else if(current[0] < current[1]) {
+					power[0] = speedRegulator(power[0] + 2);
+				}
+			}
+
+			MOTDTFrontRight.out = power[1];
+			MOTDTFrontMidRight.out = power[1];
+			MOTDTMidRight.out = power[1];
+			MOTDTBackRight.out = power[1];
+			MOTDTFrontLeft.out = power[0];
+			MOTDTFrontMidLeft.out = power[0];
+			MOTDTMidLeft.out = power[0];
+			MOTDTBackLeft.out = power[0];
+
+			delay(20);
+			current[0] = EncDTLeft.value;
+			current[1] = EncDTRight.value;
+		}
+		break;
+	case AUTOTURNBASIC:
+		target = distance;
+		if(target < gyroVal) {		//Left Turn
+			while(gyroVal > target && millis() < startTime + timeout) {
+				MOTDTFrontRight.out = pow;
+				MOTDTFrontMidRight.out = pow;
+				MOTDTMidRight.out = pow;
+				MOTDTBackRight.out = pow;
+				MOTDTFrontLeft.out = -pow;
+				MOTDTFrontMidLeft.out = -pow;
+				MOTDTMidLeft.out = -pow;
+				MOTDTBackLeft.out = -pow;
+			}
+		}
+		else if(target > gyroVal) {	//Right Turn
+			while(gyroVal < target && millis() < startTime + timeout) {
+				MOTDTFrontRight.out = -pow;
+				MOTDTFrontMidRight.out = -pow;
+				MOTDTMidRight.out = -pow;
+				MOTDTBackRight.out = -pow;
+				MOTDTFrontLeft.out = pow;
+				MOTDTFrontMidLeft.out = pow;
+				MOTDTMidLeft.out = pow;
+				MOTDTBackLeft.out = pow;
+			}
+		}
+		break;
+	case AUTODRIVEGYRO:
+
+		break;
+	case AUTOCOLLECTORS:
+		if(timeout == NULL) {
+			MOTCOL.out = pow;
+			MOTCOLLeft.out = pow;
+			MOTCOLRight.out = pow;
+		}
+		else {
+			while (millis() < startTime + timeout) {
+				MOTCOL.out = pow;
+				MOTCOLLeft.out = pow;
+				MOTCOLRight.out = pow;
+			}
+			MOTCOL.out = 0;
+			MOTCOLLeft.out = 0;
+			MOTCOLRight.out = 0;
+		}
+		break;
+	}
+}
+
+void processPid(Pid *pidLoop, int current) {
+	if (pidLoop->running) {
+		pidLoop->current = current;
+		//	printf("Current: %d\n\r", pidLoop->current);
+		pidLoop->error = pidLoop->setPoint - pidLoop->current;
+		pidLoop->integral += pidLoop->error;
+		pidLoop->derivative = pidLoop->lastError - pidLoop->error;
+
+		pidLoop->output = speedRegulator((pidLoop->error * pidLoop->kP) +
+				(pidLoop->integral * pidLoop->kI) + (pidLoop->derivative * pidLoop->kD));
+
+		pidLoop->lastError = pidLoop->error;
+	}
+
+}
+
+int speedRegulator(int speed) {
+	if(speed > 127) {
+		return 127;
+	} else if(speed < -127) {
+		return -127;
+	} else {
+		return speed;
+	}
+}
+
+int max(int a, int b) {
+	if(a < b) {
+		return b;
+	}
+	return a;
+}
+
+int min(int a, int b) {
+	if(a > b) {
+		return b;
+	}
+	return a;
+}
