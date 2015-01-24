@@ -49,13 +49,6 @@ int driveTrainStyle;
 #define AUTODRIVETIME	6
 
 
-//The basic motor struct
-struct motorStruct {
-	unsigned char port;
-	int out;
-	int reflected;
-};
-
 /*
  * The Motor type serves as a wrapper to keep track of all data for each motor on the robot.
  *
@@ -63,22 +56,11 @@ struct motorStruct {
  * @param out The power output to the motor, between -127 and 127
  * @param reflected If the output to the motor should be reversed. -1 or 1
  */
-typedef struct motorStruct Motor;
-
-//The basic pid struct
-struct pidStruct {
-	int running;
-	int setPoint;
-	int current;
-	float error;
-	float lastError;
-	long integral;
-	float derivative;
-	float kP;
-	float kI;
-	float kD;
-	int output;
-};
+typedef struct motorStruct {
+	unsigned char port;
+	int out;
+	int reflected;
+} Motor;
 
 /*
  * The Pid type contains all data for any individual pid loop we may wish to run.
@@ -95,17 +77,19 @@ struct pidStruct {
  * @param kD The coefficient for the derivative term
  * @param output The value to be set to the motors
  */
-typedef struct pidStruct Pid;
-
-//The basic Ricencoder struct
-struct RicencoderStruct {
-	int value;
-	float ticksPerRev;
-	int mult;
-	int isIME;
-	unsigned char portTop;
-	unsigned char portBot;
-};
+typedef struct pidStruct {
+	int running;
+	int setPoint;
+	int current;
+	float error;
+	float lastError;
+	long integral;
+	float derivative;
+	float kP;
+	float kI;
+	float kD;
+	int output;
+} Pid;
 
 /*
  * The Ricencoder contains data for either an IME or a quadrature encoder
@@ -120,13 +104,14 @@ struct RicencoderStruct {
  * @param portTop (If not IME) The port on the Cortex which the top wire of the encoder is plugged into
  * @param portBot (If not IME) The port on the Cortex which the bottom wire of the encoder is plugged into
  */
-typedef struct RicencoderStruct Ricencoder;
-
-//The basic Ricepot struct
-struct RicepotStruct {
-	unsigned char port;
+typedef struct RicencoderStruct {
 	int value;
-};
+	float ticksPerRev;
+	int mult;
+	int isIME;
+	unsigned char portTop;
+	unsigned char portBot;
+} Ricencoder;
 
 /*
  * The Ricepot is a wrapper for potentiometer use
@@ -134,7 +119,10 @@ struct RicepotStruct {
  * @param port The port on the Cortex which the potentiometer is plugged into
  * @param value The current value of the potentiometer
  */
-typedef struct RicepotStruct Ricepot;
+typedef struct RicepotStruct {
+	unsigned char port;
+	int value;
+} Ricepot;
 
 //Declaration of all possible Drivetrain motors
 Motor MOTDTFrontRight;
