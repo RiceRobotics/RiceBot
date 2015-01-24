@@ -11,6 +11,7 @@
  */
 
 #include "main.h"
+#include "RiceBot.h"
 
 /*
  * Initializes a Motor type
