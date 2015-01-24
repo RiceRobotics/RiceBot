@@ -75,7 +75,7 @@ Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char 
 	r->mult = mult;
 	r->adjustedValue = 0;
 	r->isIME = isIME;
-	r.imeAddress = imeAddress;
+	r->imeAddress = imeAddress;
 	r->portTop = portTop;
 	r->portBot = portBot;
 	if(!isIME) {
@@ -227,7 +227,7 @@ void setDriveTrainMotors() {
 
 void updateRicencoder(Ricencoder *rc) {
 	if(rc->isIME) {
-		imeGet(rc.imeAddress, rc->rawValue);
+		imeGet(rc->imeAddress, rc->rawValue);
 	}
 	else {
 		rc->rawValue = encoderGet(rc->enc);

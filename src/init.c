@@ -113,27 +113,10 @@ void startIOTask(void *ignore) {
 		PotARMLeft.value = analogReadCalibrated(PotARMLeft.port);
 		PotARMRight.value = analogReadCalibrated(PotARMRight.port);
 
-		if(EncDTLeft.isIME) {
-			imeGet(IMEDTLEFT, &EncDTLeft.value);
-		} else {
-			EncDTLeft.value = encoderGet(ENCDTLeft);
-		}
-		if(EncDTRight.isIME) {
-			imeGet(IMEDTRIGHT, &EncDTRight.value);
-		} else {
-			EncDTRight.value = encoderGet(ENCDTRight);
-		}
-
-		if(EncARMLeft.isIME) {
-			imeGet(IMEARMLEFT, &EncARMLeft.value);
-		} else {
-			EncARMLeft.value = encoderGet(ENCARMLeft);
-		}
-		if(EncARMRight.isIME) {
-			imeGet(IMEARMRIGHT, &EncARMRight.value);
-		} else {
-			EncARMRight.value = encoderGet(ENCARMRight);
-		}
+		updateRicencoder(&EncDTLeft);
+		updateRicencoder(&EncARMRight);
+		updateRicencoder(&EncDTLeft);
+		updateRicencoder(&EncDTRight);
 
 		gyroVal = gyroGet(gyro);
 

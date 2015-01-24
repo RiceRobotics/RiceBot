@@ -210,8 +210,8 @@ Motor initMotor(unsigned char port, int reflected);
 
 Pid initPid(float kP, float kI, float kD);
 
-Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME,
-		unsigned char portTop, unsigned char portBot, Encoder *enc, bool reverse);
+Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char imeAddress,
+		unsigned char portTop, unsigned char portBot, bool reverse);
 
 Ricepot initRicepot(unsigned char port);
 
