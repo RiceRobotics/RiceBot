@@ -94,23 +94,31 @@ typedef struct pidStruct {
 /*
  * The Ricencoder contains data for either an IME or a quadrature encoder
  *
- * @param value The current value of the encoder
+ * @param rawValue The true value of the encoder
  * @param ticksPerRev The number of ticks per revolution of the encoder
  * 						627.2 for the 393 IME in high torque mode (factory default)
  * 						392 for the 393 IME in high speed mode
  * 						360 for the Quadrature Encoder
  * @param mult A multiplier to use as compensation for gear ratio
+ * @param adjustedValue The multiplied value of the encoder
  * @param isIME 1 if IME, 0 if quad encoder
+ * @param imeAddress The address if IME
+ * @param enc (If not IME) The PROS base encoder type needed for retrieving the value
  * @param portTop (If not IME) The port on the Cortex which the top wire of the encoder is plugged into
  * @param portBot (If not IME) The port on the Cortex which the bottom wire of the encoder is plugged into
+ * @param reverse (If not IME) Whether the QuadEncoder should count in the opposite direction
  */
 typedef struct RicencoderStruct {
-	int value;
+	int rawValue;
 	float ticksPerRev;
 	int mult;
+	int adjustedValue;
 	int isIME;
+	unsigned char imeAddress;
+	Encoder enc;
 	unsigned char portTop;
 	unsigned char portBot;
+	bool reverse;
 } Ricencoder;
 
 /*
@@ -123,6 +131,21 @@ typedef struct RicepotStruct {
 	unsigned char port;
 	int value;
 } Ricepot;
+
+/*
+ * The Ricegyro is a wrapper for gyro use.
+ *
+ * @param g The PROS Gyro base type
+ * @param port The port on the Cortex which the potentiometer is plugged into
+ * @param value The current value of the gyro
+ * @param multiplier Sensitivity calibration for the gyro. Use 0 for the default value of 196
+ */
+typedef struct RicegyroStruct {
+	Gyro g;
+	unsigned char port;
+	int value;
+	unsigned short multiplier;
+} Ricegyro;
 
 //Declaration of all possible Drivetrain motors
 Motor MOTDTFrontRight;
@@ -159,10 +182,10 @@ unsigned char IMEDTRIGHT;
 unsigned char IMEARMLEFT;
 unsigned char IMEARMRIGHT;
 
-Encoder ENCDTLeft;
-Encoder ENCDTRight;
-Encoder ENCARMLeft;
-Encoder ENCARMRight;
+//Encoder ENCDTLeft;
+//Encoder ENCDTRight;
+//Encoder ENCARMLeft;
+//Encoder ENCARMRight;
 
 Ricencoder EncDTLeft;
 Ricencoder EncDTRight;
@@ -199,6 +222,8 @@ void riceBotInitialize();
 void getJoystickForDriveTrain();
 
 void setDriveTrainMotors();
+
+void updateRicencoder(Ricencoder *rc);
 
 void autonomousTask(int instruction, int distance, int pow, long timeout);
 
