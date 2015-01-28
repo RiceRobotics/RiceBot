@@ -18,11 +18,11 @@
 #define BLUE 1
 
 //Control Style
-#define CTTANKDRIVE 	0
-#define CTARCADEDRIVE	1
-#define CTCHEEZYDRIVE	2
-#define CTMECANUMDRIVE	3
-#define CTHDRIVE		4
+#define CTTANKDRIVE  	0
+#define CTARCADEDRIVE 	1
+#define CTCHEEZYDRIVE  	2
+#define CTMECANUMDRIVE  3
+#define CTHDRIVE  		4
 
 //Defines how the analog joystick inputs translate to motor outputs (CT-)
 int controlStyle;
@@ -33,7 +33,6 @@ int controlStyle;
 #define DTEIGHTWHEELS 	2
 #define DTMECANUM 		3
 #define DTHOLONOMIC 	4
-#define DTDTHDRIVE 		5
 #define DTSWERVE 		6
 
 //Defines the drivetrain installed on the robot (DT-)
@@ -196,9 +195,7 @@ Ricepot PotARMFront;
 Ricepot PotARMLeft;
 Ricepot PotARMRight;
 
-Gyro gyro;
-//Value of Gyro retrieved at last IOTask
-int gyroVal;
+Ricegyro gyro;
 
 Pid PidDTLeft;
 Pid PidDTRight;

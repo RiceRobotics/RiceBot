@@ -321,8 +321,8 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		break;
 	case AUTOTURNBASIC:
 		target = distance;
-		if(target < gyroVal) {		//Left Turn
-			while(gyroVal > target && millis() < startTime + timeout) {
+		if(target < gyro.value) {		//Left Turn
+			while(gyro.value > target && millis() < startTime + timeout) {
 				MOTDTFrontRight.out = pow;
 				MOTDTFrontMidRight.out = pow;
 				MOTDTMidRight.out = pow;
@@ -333,8 +333,8 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 				MOTDTBackLeft.out = -pow;
 			}
 		}
-		else if(target > gyroVal) {	//Right Turn
-			while(gyroVal < target && millis() < startTime + timeout) {
+		else if(target > gyro.value) {	//Right Turn
+			while(gyro.value < target && millis() < startTime + timeout) {
 				MOTDTFrontRight.out = -pow;
 				MOTDTFrontMidRight.out = -pow;
 				MOTDTMidRight.out = -pow;
@@ -348,6 +348,8 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		break;
 	case AUTODRIVEGYRO:
 		target = EncDTLeft.ticksPerRev / (4 * MATH_PI) * distance;
+		int targetGyro = gyro.value;
+
 
 		break;
 	case AUTOCOLLECTORS:

@@ -77,6 +77,8 @@ void initialize() {
 	//
 	//	EncARMLeft = initRicencoder(627.2, 1, 1, 0, 0, NULL, 0);
 	//	EncARMRight = initRicencoder(627.2, 1, 1, 0, 0, NULL, 0);
+
+//	gyro = initRicegyro(1, 1);
 	//
 	//	PidARMLeft = initPid(.2, 0, 0);
 	//	PidARMRight = initPid(.2, 0, 0);
@@ -118,7 +120,7 @@ void startIOTask(void *ignore) {
 		updateRicencoder(&EncDTLeft);
 		updateRicencoder(&EncDTRight);
 
-		gyroVal = gyroGet(gyro);
+//		updateRicegyro(gyro);
 
 		delay(10);
 	}
