@@ -101,6 +101,12 @@ Ricepot initRicepot(unsigned char port) {
 	return *r;
 }
 
+/*
+ * Initializes a Ricegyro
+ *
+ * @param port The port on the Cortex which the gyro is plugged into
+ * @param multiplier Sensitivity calibration for the gyro. Use 0 for the default value of 196
+ */
 Ricegyro initRicegyro(unsigned char port, unsigned short multiplier) {
 	Ricegyro *gyro = malloc(sizeof(Ricegyro));
 	gyro->port = port;
@@ -240,6 +246,11 @@ void setDriveTrainMotors() {
 	}
 }
 
+/*
+ * Updates the value of any Ricencoder based on a pointer to the struct
+ *
+ * @param *rc A pointer to the Ricencoder struct
+ */
 void updateRicencoder(Ricencoder *rc) {
 	if(rc->isIME) {
 		imeGet(rc->imeAddress, &rc->rawValue);
@@ -248,6 +259,15 @@ void updateRicencoder(Ricencoder *rc) {
 		rc->rawValue = encoderGet(rc->enc);
 	}
 	rc->adjustedValue = rc->rawValue * rc->mult;
+}
+
+/*
+ * Updates the value of any Ricegyro based on a pointer to the struct
+ *
+ * @param *rg A pointer to the Ricegyro struct
+ */
+void updateRicegyro(Ricegyro *rg) {
+	rg->value = gyroGet(rg->g);
 }
 
 void autonomousTask(int instruction, int distance, int pow, long timeout) {
@@ -350,6 +370,13 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 	}
 }
 
+/*
+ * Updates a PID loop based on the value of a sensor
+ *
+ * @param *pidLoop A pointer to the pid struct to update
+ * @param current The current value of the relevant sensor to use with the pid loop
+ *
+ */
 void processPid(Pid *pidLoop, int current) {
 	if (pidLoop->running) {
 		pidLoop->current = current;
@@ -366,6 +393,13 @@ void processPid(Pid *pidLoop, int current) {
 
 }
 
+/*
+ * Ensures a value is inside the acceptable bounds for a motor output
+ *
+ * @param speed The desired speed to set to a motor
+ *
+ * @return An integer adjusted to -127 <= value <= 127
+ */
 int speedRegulator(int speed) {
 	if(speed > 127) {
 		return 127;
@@ -376,6 +410,14 @@ int speedRegulator(int speed) {
 	}
 }
 
+/*
+ * Determines which of two numbers is larger
+ *
+ * @param a The first number
+ * @param b The second number
+ *
+ * @return Whichever number is larger
+ */
 int max(int a, int b) {
 	if(a < b) {
 		return b;
@@ -383,6 +425,14 @@ int max(int a, int b) {
 	return a;
 }
 
+/*
+ * Determines which of two numbers is smaller
+ *
+ * @param a The first number
+ * @param b The second number
+ *
+ * @return Whichever number is smaller
+ */
 int min(int a, int b) {
 	if(a > b) {
 		return b;

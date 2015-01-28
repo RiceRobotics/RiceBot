@@ -225,6 +225,8 @@ void setDriveTrainMotors();
 
 void updateRicencoder(Ricencoder *rc);
 
+void updateRicegyro(Ricegyro *rg);
+
 void autonomousTask(int instruction, int distance, int pow, long timeout);
 
 void processPid(Pid *pidLoop, int current);
