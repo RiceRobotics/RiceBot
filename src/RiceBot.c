@@ -62,8 +62,10 @@ Pid initPid(float kP, float kI, float kD) {
  * 						360 for the Quadrature Encoder
  * @param mult A multiplier to use as compensation for gear ratio
  * @param isIME 1 if IME, 0 if quad encoder
+ * @param imeAddress The address of the IME, in order of the chain from the Cortex. Starts at 0
  * @param portTop (If not IME) The port on the Cortex which the top wire of the encoder is plugged into
  * @param portBot (If not IME) The port on the Cortex which the bottom wire of the encoder is plugged into
+ * @param reverse (If not IME) Whether the QuadEncoder should count in the reverse direction
  *
  * @return The initialized and configured Ricencoder
  */
@@ -97,6 +99,19 @@ Ricepot initRicepot(unsigned char port) {
 	r->port = port;
 	r->value = 0;
 	return *r;
+}
+
+Ricegyro initRicegyro(unsigned char port, unsigned short multiplier) {
+	Ricegyro *gyro = malloc(sizeof(Ricegyro));
+	gyro->port = port;
+	gyro->multiplier = multiplier;
+	printf("Ricegyro Initialization (no touchie the robutt\n\r");
+	gyro->g = gyroInit(gyro->port, gyro->multiplier);
+	delay(1000);
+	printf("Ricegyro Initialized with minimal casualties\n\r");
+	gyroReset(gyro->g);
+	gyro->value = 0;
+	return *gyro;
 }
 
 void riceBotInitializeIO() {
@@ -227,7 +242,7 @@ void setDriveTrainMotors() {
 
 void updateRicencoder(Ricencoder *rc) {
 	if(rc->isIME) {
-		imeGet(rc->imeAddress, rc->rawValue);
+		imeGet(rc->imeAddress, &rc->rawValue);
 	}
 	else {
 		rc->rawValue = encoderGet(rc->enc);
