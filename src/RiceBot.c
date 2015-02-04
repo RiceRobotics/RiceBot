@@ -278,6 +278,10 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 	power[1] = (pow == NULL) ? 127 : pow;
 	power[0] = power[1];
 
+	int currentEnc[2] = {EncDTLeft.adjustedValue, EncDTRight.adjustedValue};
+//	currentEnc[0] = EncDTLeft.adjustedValue;
+//	currentEnc[1] = EncDTRight.adjustedValue;
+
 	switch(instruction) {
 	case AUTODRIVETIME:
 		while(millis() < startTime + timeout) {
@@ -294,13 +298,12 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 	case AUTODRIVEBASIC:
 		target = EncDTLeft.ticksPerRev / (4 * MATH_PI) * distance;
 		//		power = (pow == NULL) ? 127 : pow;
-		int current[2] = {EncDTLeft.rawValue, EncDTRight.rawValue};
 
-		while(current[1] < target && millis() < startTime + timeout) {
-			if(abs(current[1] - current[0]) > 50) {
-				if(current[0] > current[1]) {
+		while(currentEnc[1] < target && millis() < startTime + timeout) {
+			if(abs(currentEnc[1] - currentEnc[0]) > 50) {
+				if(currentEnc[0] > currentEnc[1]) {
 					power[0] = speedRegulator(power[0] - 2);
-				} else if(current[0] < current[1]) {
+				} else if(currentEnc[0] < currentEnc[1]) {
 					power[0] = speedRegulator(power[0] + 2);
 				}
 			}
@@ -315,8 +318,8 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 			MOTDTBackLeft.out = power[0];
 
 			delay(20);
-			current[0] = EncDTLeft.rawValue;
-			current[1] = EncDTRight.rawValue;
+			currentEnc[0] = EncDTLeft.rawValue;
+			currentEnc[1] = EncDTRight.rawValue;
 		}
 		break;
 	case AUTOTURNBASIC:
@@ -350,7 +353,30 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		target = EncDTLeft.ticksPerRev / (4 * MATH_PI) * distance;
 		int targetGyro = gyro.value;
 
+		while(currentEnc[1] < target && millis() < startTime + timeout) {
+			if(abs(gyro.value - targetGyro) > 10) {				//If gyro is outside of tolerance from start orientation
+				if(gyro.value > targetGyro) {					//Too far CCW
+					power[0] = speedRegulator(power[0] + 2);
+					power[1] = speedRegulator(power[1] - 2);
+				} else if(gyro.value < targetGyro) {			//Too far CW
+					power[0] = speedRegulator(power[0] - 2);
+					power[1] = speedRegulator(power[1] + 2);
+				}
+			}
 
+			MOTDTFrontRight.out = power[1];
+			MOTDTFrontMidRight.out = power[1];
+			MOTDTMidRight.out = power[1];
+			MOTDTBackRight.out = power[1];
+			MOTDTFrontLeft.out = power[0];
+			MOTDTFrontMidLeft.out = power[0];
+			MOTDTMidLeft.out = power[0];
+			MOTDTBackLeft.out = power[0];
+
+			delay(20);
+			currentEnc[0] = EncDTLeft.adjustedValue;
+			currentEnc[1] = EncDTRight.adjustedValue;
+		}
 		break;
 	case AUTOCOLLECTORS:
 		if(timeout == NULL) {
@@ -368,6 +394,8 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 			MOTCOLLeft.out = 0;
 			MOTCOLRight.out = 0;
 		}
+		break;
+	default:
 		break;
 	}
 }
