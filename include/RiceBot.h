@@ -212,6 +212,8 @@ Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char 
 
 Ricepot initRicepot(unsigned char port);
 
+Ricegyro initRicegyro(unsigned char port, unsigned short multiplier);
+
 void riceBotInitializeIO();
 
 void riceBotInitialize();
