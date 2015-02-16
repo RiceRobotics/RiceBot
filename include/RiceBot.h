@@ -203,6 +203,8 @@ Pid PidDTLeft;
 Pid PidDTRight;
 Pid PidARMLeft;
 Pid PidARMRight;
+Pid PidARMBottom;
+Pid PidARMTop;
 Pid PidARMFront;
 
 Motor initMotor(unsigned char port, int reflected);
