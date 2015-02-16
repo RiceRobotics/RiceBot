@@ -190,6 +190,8 @@ Ricencoder EncDTLeft;
 Ricencoder EncDTRight;
 Ricencoder EncARMLeft;
 Ricencoder EncARMRight;
+Ricencoder EncARMBottom;
+Ricencoder EncARMTop;
 
 Ricepot PotARMFront;
 Ricepot PotARMLeft;
