@@ -125,10 +125,12 @@ typedef struct RicencoderStruct {
  *
  * @param port The port on the Cortex which the potentiometer is plugged into
  * @param value The current value of the potentiometer
+ * @param reversed Whether or not the potentiometer value should be inverted
  */
 typedef struct RicepotStruct {
 	unsigned char port;
 	int value;
+	int reversed;
 } Ricepot;
 
 /*
@@ -170,11 +172,17 @@ Motor MOTARMTopRight;
 Motor MOTARMBottomRight;
 Motor MOTARMTopLeft;
 Motor MOTARMBottomLeft;
+Motor MOTARMOuterLeft;
+Motor MOTARMOuterRight;
+Motor MOTARMInnerLeft;
+Motor MOTARMInnerRight;
 
 //Declaration of all possible Collector motors
 Motor MOTCOL;
 Motor MOTCOLLeft;
 Motor MOTCOLRight;
+
+Motor MOTCLAW;
 
 unsigned char IMEDTLEFT;
 unsigned char IMEDTRIGHT;
@@ -210,7 +218,7 @@ Pid initPid(float kP, float kI, float kD);
 Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char imeAddress,
 		unsigned char portTop, unsigned char portBot, bool reverse);
 
-Ricepot initRicepot(unsigned char port);
+Ricepot initRicepot(unsigned char port, int reversed);
 
 Ricegyro initRicegyro(unsigned char port, unsigned short multiplier);
 
@@ -223,6 +231,8 @@ void getJoystickForDriveTrain();
 void setDriveTrainMotors();
 
 void updateRicencoder(Ricencoder *rc);
+
+void updateRicepot(Ricepot *rp);
 
 void updateRicegyro(Ricegyro *rg);
 

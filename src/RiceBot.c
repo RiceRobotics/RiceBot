@@ -91,14 +91,16 @@ Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char 
  * Initializes a Ricepot
  *
  * @param port The port on the Cortex which the potentiometer is plugged into
+ * @param reversed 1 if normal, -1 if inverted
  *
  * @return The initialized and configured Ricepot
  */
-Ricepot initRicepot(unsigned char port) {
+Ricepot initRicepot(unsigned char port, int reversed) {
 	analogCalibrate(port);
 	Ricepot *r = malloc(sizeof(Ricepot));
 	r->port = port;
 	r->value = 0;
+	r->reversed = reversed;
 	return *r;
 }
 
@@ -265,6 +267,15 @@ void updateRicencoder(Ricencoder *rc) {
 	else {
 		rc->adjustedValue = rc->rawValue * rc->mult;
 	}
+}
+
+/*
+ * Updates the value of any Ricepot based on a pointer to the struct
+ *
+ * @param *rg A pointer to the Ricepot struct
+ */
+void updateRicepot(Ricepot *rp) {
+	rp->value = analogReadCalibrated(rp->port) * rp->reversed;
 }
 
 /*
