@@ -9,10 +9,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct {
+	int elem_total = 10;
+	int elem_current = 0;
+	Motor data[10];
+} Motor_vector;
+
 Motor_vector* init_Motor_vector() {
 	Motor_vector* vect = malloc(sizeof(Motor_vector));
 	vect->elem_total = 10;
 	vect->elem_current = 0;
+	
 	return vect;
 }
 
