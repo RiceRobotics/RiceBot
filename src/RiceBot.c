@@ -133,10 +133,10 @@ void riceBotInitializeIO() {
  */
 void riceBotInitialize() {
 
-//	ENCDTLeft = encoderInit(0, 0, false);
-//	ENCDTRight = encoderInit(0, 0, false);
-//	ENCARMLeft = encoderInit(0, 0, false);
-//	ENCARMRight = encoderInit(0, 0, false);
+	//	ENCDTLeft = encoderInit(0, 0, false);
+	//	ENCDTRight = encoderInit(0, 0, false);
+	//	ENCARMLeft = encoderInit(0, 0, false);
+	//	ENCARMRight = encoderInit(0, 0, false);
 
 }
 
@@ -296,8 +296,8 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 	power[0] = power[1];
 
 	int currentEnc[2] = {EncDTLeft.adjustedValue, EncDTRight.adjustedValue};
-//	currentEnc[0] = EncDTLeft.adjustedValue;
-//	currentEnc[1] = EncDTRight.adjustedValue;
+	//	currentEnc[0] = EncDTLeft.adjustedValue;
+	//	currentEnc[1] = EncDTRight.adjustedValue;
 
 	switch(instruction) {
 	case AUTODRIVETIME:
@@ -311,6 +311,14 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 			MOTDTMidLeft.out = power[0];
 			MOTDTBackLeft.out = power[0];
 		}
+		MOTDTFrontRight.out = 0;
+		MOTDTFrontMidRight.out = 0;
+		MOTDTMidRight.out = 0;
+		MOTDTBackRight.out = 0;
+		MOTDTFrontLeft.out = 0;
+		MOTDTFrontMidLeft.out = 0;
+		MOTDTMidLeft.out = 0;
+		MOTDTBackLeft.out = 0;
 		break;
 	case AUTODRIVEBASIC:
 		target = EncDTLeft.ticksPerRev / (4 * MATH_PI) * distance;
@@ -411,6 +419,70 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 			MOTCOLLeft.out = 0;
 			MOTCOLRight.out = 0;
 		}
+		break;
+	case AUTOARMTIME:
+		PidARMLeft.running = 0;
+		PidARMRight.running = 0;
+		if(timeout == NULL) {
+			MOTARMBottomLeft.out = pow;
+			MOTARMBottomRight.out = pow;
+		}
+		else {
+			while (millis() < startTime + timeout) {
+				MOTARMBottomLeft.out = pow;
+				MOTARMBottomRight.out = pow;
+			}
+			PidARMLeft.running = 1;
+			PidARMRight.running = 1;
+			PidARMLeft.setPoint = EncARMLeft.adjustedValue + 60;
+			PidARMRight.setPoint = EncARMRight.adjustedValue + 60;
+		}
+		break;
+	case AUTOCLAW:
+		if(timeout == NULL) {
+			MOTCLAW.out = pow;
+		}
+		else {
+			while (millis() < startTime + timeout) {
+				MOTCLAW.out = pow;
+			}
+			MOTCLAW.out = 0;
+		}
+		break;
+	case AUTOTURNTIME:
+		target = distance;
+		if(target > 0) {		//Left Turn
+			while(millis() < startTime + timeout) {
+				MOTDTFrontRight.out = pow;
+				MOTDTFrontMidRight.out = pow;
+				MOTDTMidRight.out = pow;
+				MOTDTBackRight.out = pow;
+				MOTDTFrontLeft.out = -pow;
+				MOTDTFrontMidLeft.out = -pow;
+				MOTDTMidLeft.out = -pow;
+				MOTDTBackLeft.out = -pow;
+			}
+		}
+		else if(target < 0) {	//Right Turn
+			while(millis() < startTime + timeout) {
+				MOTDTFrontRight.out = -pow;
+				MOTDTFrontMidRight.out = -pow;
+				MOTDTMidRight.out = -pow;
+				MOTDTBackRight.out = -pow;
+				MOTDTFrontLeft.out = pow;
+				MOTDTFrontMidLeft.out = pow;
+				MOTDTMidLeft.out = pow;
+				MOTDTBackLeft.out = pow;
+			}
+		}
+		MOTDTFrontRight.out = 0;
+		MOTDTFrontMidRight.out = 0;
+		MOTDTMidRight.out = 0;
+		MOTDTBackRight.out = 0;
+		MOTDTFrontLeft.out = 0;
+		MOTDTFrontMidLeft.out = 0;
+		MOTDTMidLeft.out = 0;
+		MOTDTBackLeft.out = 0;
 		break;
 	default:
 		break;

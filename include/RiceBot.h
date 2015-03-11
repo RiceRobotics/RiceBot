@@ -46,7 +46,9 @@ int driveTrainStyle;
 #define AUTOARMPID		4
 #define AUTOCOLLECTORS	5
 #define AUTODRIVETIME	6
-
+#define AUTOTURNTIME	7
+#define AUTOCLAW		8
+#define AUTOARMTIME		9
 
 /*
  * The Motor type serves as a wrapper to keep track of all data for each motor on the robot.
@@ -149,6 +151,7 @@ typedef struct RicegyroStruct {
 } Ricegyro;
 
 //Declaration of all possible Drivetrain motors
+Motor MOTDTFront;
 Motor MOTDTFrontRight;
 Motor MOTDTFrontMidRight;
 Motor MOTDTMidRight;
@@ -157,6 +160,7 @@ Motor MOTDTFrontLeft;
 Motor MOTDTFrontMidLeft;
 Motor MOTDTMidLeft;
 Motor MOTDTBackLeft;
+Motor MOTDTBack;
 
 //Declaration of all possible Arm motors
 //This is just to make the code more understandable when comparing an arm motor
@@ -189,15 +193,13 @@ unsigned char IMEDTRIGHT;
 unsigned char IMEARMLEFT;
 unsigned char IMEARMRIGHT;
 
-//Encoder ENCDTLeft;
-//Encoder ENCDTRight;
-//Encoder ENCARMLeft;
-//Encoder ENCARMRight;
 
 Ricencoder EncDTLeft;
 Ricencoder EncDTRight;
 Ricencoder EncARMLeft;
 Ricencoder EncARMRight;
+Ricencoder EncARMBottom;
+Ricencoder EncARMTop;
 
 Ricepot PotARMFront;
 Ricepot PotARMLeft;
@@ -210,6 +212,8 @@ Pid PidDTRight;
 Pid PidARMLeft;
 Pid PidARMRight;
 Pid PidARMFront;
+Pid PidARMTop;
+Pid PidARMBottom;
 
 Motor initMotor(unsigned char port, int reflected);
 
