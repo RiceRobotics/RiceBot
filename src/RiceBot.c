@@ -623,7 +623,6 @@ int max4(int a, int b, int c, int d) {
 }
 
 void IOTask() {
-//	while(1) {
 		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
 		motorSet(MOTDTFrontMidLeft.port, MOTDTFrontMidLeft.out * MOTDTFrontMidLeft.reflected);
 		motorSet(MOTDTMidLeft.port, MOTDTMidLeft.out * MOTDTMidLeft.reflected);
@@ -657,5 +656,4 @@ void IOTask() {
 		updateRicepot(&PotARMFront);
 
 		updateRicegyro(&gyro);
-//	}
 }
