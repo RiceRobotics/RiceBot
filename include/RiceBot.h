@@ -211,6 +211,8 @@ Pid PidDTLeft;
 Pid PidDTRight;
 Pid PidARMLeft;
 Pid PidARMRight;
+Pid PidARMBottom;
+Pid PidARMTop;
 Pid PidARMFront;
 Pid PidARMTop;
 Pid PidARMBottom;
