@@ -222,6 +222,12 @@ Pid initPid(float kP, float kI, float kD);
 Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char imeAddress,
 		unsigned char portTop, unsigned char portBot, bool reverse);
 
+Ricencoder initRicencoderIME(float ticksPerRev, int mult, unsigned char imeAddress,
+		bool reverse);
+
+Ricencoder initRicencoderQUAD(float ticksPerRev, int mult, unsigned char portTop,
+		unsigned char portBot, bool reverse);
+
 Ricepot initRicepot(unsigned char port, int reversed);
 
 Ricegyro initRicegyro(unsigned char port, unsigned short multiplier);
@@ -246,12 +252,19 @@ void processPid(Pid *pidLoop, int current);
 
 int speedRegulator(int speed);
 
+int normalize(int left, int right);
+
+void DTStopMotors();
+
 void startIOTask(void *ignore);
+void IOTask();
 
 void startPidTask(void *ignore);
 
 int max(int a, int b);
 
 int min(int a, int b);
+
+int max4(int a, int b, int c, int d);
 
 #endif /* RICEBOT_H_ */

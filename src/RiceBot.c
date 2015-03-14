@@ -87,6 +87,37 @@ Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char 
 	return *r;
 }
 
+Ricencoder initRicencoderIME(float ticksPerRev, int mult, unsigned char imeAddress,
+		bool reverse) {
+	Ricencoder *r = malloc(sizeof(Ricencoder));
+		r->rawValue = 0;
+		r->ticksPerRev = ticksPerRev;
+		r->mult = mult;
+		r->adjustedValue = 0;
+		r->isIME = 1;
+		r->imeAddress = imeAddress;
+		r->portTop = 0;
+		r->portBot = 0;
+		r->reverse = reverse;
+		return *r;
+}
+
+Ricencoder initRicencoderQUAD(float ticksPerRev, int mult, unsigned char portTop,
+		unsigned char portBot, bool reverse) {
+	Ricencoder *r = malloc(sizeof(Ricencoder));
+		r->rawValue = 0;
+		r->ticksPerRev = ticksPerRev;
+		r->mult = mult;
+		r->adjustedValue = 0;
+		r->isIME = 0;
+		r->imeAddress = 0;
+		r->portTop = portTop;
+		r->portBot = portBot;
+		r->reverse = reverse;
+		r->enc = encoderInit(portTop, portBot, reverse);
+		return *r;
+}
+
 /*
  * Initializes a Ricepot
  *
@@ -155,6 +186,7 @@ void getJoystickForDriveTrain() {
 	int y1 = joystickGetAnalog(1, 3);
 	int x2 = joystickGetAnalog(1, 1);
 	int y2 = joystickGetAnalog(1, 2);
+	int left, right, norm;
 
 	switch(controlStyle) {
 	case CTTANKDRIVE:
@@ -169,27 +201,36 @@ void getJoystickForDriveTrain() {
 		MOTDTBackRight.out = y2;
 		break;
 	case CTARCADEDRIVE:
-		MOTDTFrontLeft.out = (y1 + x1) / 2;
-		MOTDTFrontMidLeft.out = (y1 + x1) / 2;
-		MOTDTMidLeft.out = (y1 + x1) / 2;
-		MOTDTBackLeft.out = (y1 + x1) / 2;
+		left = y1 + x1;
+		right = y1 - x1;
+		norm = normalize(left, right);
 
-		MOTDTFrontRight.out = (y1 - x1) / 2;
-		MOTDTFrontMidRight.out = (y1 - x1) / 2;
-		MOTDTMidRight.out = (y1 - x1) / 2;
-		MOTDTBackRight.out = (y1 - x1) / 2;
+		MOTDTFrontLeft.out = left * norm;
+		MOTDTFrontMidLeft.out = left * norm;
+		MOTDTMidLeft.out = left * norm;
+		MOTDTBackLeft.out = left * norm;
+
+		MOTDTFrontRight.out = right * norm;
+		MOTDTFrontMidRight.out = right * norm;
+		MOTDTMidRight.out = right * norm;
+		MOTDTBackRight.out = (right * norm);
 		break;
 	case CTCHEEZYDRIVE:
-		MOTDTFrontLeft.out = (y1 + x2) / 2;
-		MOTDTFrontMidLeft.out = (y1 + x2) / 2;
-		MOTDTMidLeft.out = (y1 + x2) / 2;
-		MOTDTBackLeft.out = (y1 + x2) / 2;
+		left = y1 + x2;
+		right = y1 - x2;
+		norm = normalize(left, right);
 
-		MOTDTFrontRight.out = (y1 - x2) / 2;
-		MOTDTFrontMidRight.out = (y1 - x2) / 2;
-		MOTDTMidRight.out = (y1 - x2) / 2;
-		MOTDTBackRight.out = (y1 - x2) / 2;
+		MOTDTFrontLeft.out = left * norm;
+		MOTDTFrontMidLeft.out = left * norm;
+		MOTDTMidLeft.out = left * norm;
+		MOTDTBackLeft.out = left * norm;
+
+		MOTDTFrontRight.out = right * norm;
+		MOTDTFrontMidRight.out = right * norm;
+		MOTDTMidRight.out = right * norm;
+		MOTDTBackRight.out = (right * norm);
 		break;
+
 	case CTMECANUMDRIVE:
 		MOTDTFrontLeft.out = y1 + x2 + x1;
 		MOTDTBackLeft.out = y1 + x2 - x1;
@@ -261,12 +302,7 @@ void updateRicencoder(Ricencoder *rc) {
 	else {
 		rc->rawValue = encoderGet(rc->enc);
 	}
-	if(rc->reverse) {
-		rc->adjustedValue = rc->rawValue * rc->mult * -1;
-	}
-	else {
-		rc->adjustedValue = rc->rawValue * rc->mult;
-	}
+	rc->adjustedValue = rc->rawValue * rc->mult * (rc->reverse ? 1 : -1);
 }
 
 /*
@@ -296,8 +332,6 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 	power[0] = power[1];
 
 	int currentEnc[2] = {EncDTLeft.adjustedValue, EncDTRight.adjustedValue};
-	//	currentEnc[0] = EncDTLeft.adjustedValue;
-	//	currentEnc[1] = EncDTRight.adjustedValue;
 
 	switch(instruction) {
 	case AUTODRIVETIME:
@@ -311,14 +345,6 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 			MOTDTMidLeft.out = power[0];
 			MOTDTBackLeft.out = power[0];
 		}
-		MOTDTFrontRight.out = 0;
-		MOTDTFrontMidRight.out = 0;
-		MOTDTMidRight.out = 0;
-		MOTDTBackRight.out = 0;
-		MOTDTFrontLeft.out = 0;
-		MOTDTFrontMidLeft.out = 0;
-		MOTDTMidLeft.out = 0;
-		MOTDTBackLeft.out = 0;
 		break;
 	case AUTODRIVEBASIC:
 		target = EncDTLeft.ticksPerRev / (4 * MATH_PI) * distance;
@@ -348,9 +374,11 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		}
 		break;
 	case AUTOTURNBASIC:
-		target = distance;
-		if(target < gyro.value) {		//Left Turn
-			while(gyro.value > target && millis() < startTime + timeout) {
+		target = gyro.value + distance;
+		printf("Target: %d\n\r", target);
+		if(gyro.value < target) {		//Left Turn
+			while(gyro.value < target && millis() < startTime + timeout) {
+				printf("Left Turn! Target: %d, Current: %d\n\r", target, gyro.value);
 				MOTDTFrontRight.out = pow;
 				MOTDTFrontMidRight.out = pow;
 				MOTDTMidRight.out = pow;
@@ -361,8 +389,9 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 				MOTDTBackLeft.out = -pow;
 			}
 		}
-		else if(target > gyro.value) {	//Right Turn
-			while(gyro.value < target && millis() < startTime + timeout) {
+		else if(gyro.value > target) {	//Right Turn
+			while(gyro.value > target && millis() < startTime + timeout) {
+				printf("Right Turn! Target: %d, Current: %d\n\r", target, gyro.value);
 				MOTDTFrontRight.out = -pow;
 				MOTDTFrontMidRight.out = -pow;
 				MOTDTMidRight.out = -pow;
@@ -487,6 +516,7 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 	default:
 		break;
 	}
+	DTStopMotors();
 }
 
 /*
@@ -529,6 +559,25 @@ int speedRegulator(int speed) {
 	}
 }
 
+int normalize(int left, int right) {
+	int norm = 1;
+	if(max(left, right) > 127) {
+		norm = 127 / max(left, right);
+	}
+	return norm;
+}
+
+void DTStopMotors() {
+	MOTDTFrontRight.out = 0;
+	MOTDTFrontMidRight.out = 0;
+	MOTDTMidRight.out = 0;
+	MOTDTBackRight.out = 0;
+	MOTDTFrontLeft.out = 0;
+	MOTDTFrontMidLeft.out = 0;
+	MOTDTMidLeft.out = 0;
+	MOTDTBackLeft.out = 0;
+}
+
 /*
  * Determines which of two numbers is larger
  *
@@ -557,4 +606,56 @@ int min(int a, int b) {
 		return b;
 	}
 	return a;
+}
+
+/*
+ * Determines which of 4 numbers is the largest
+ *
+ * @param a The first number
+ * @param b The second number
+ * @param c The third number
+ * @param d The fourth number
+ *
+ * @return The largest number
+ */
+int max4(int a, int b, int c, int d) {
+	return max(max(max(a, b), c), d);
+}
+
+void IOTask() {
+//	while(1) {
+		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
+		motorSet(MOTDTFrontMidLeft.port, MOTDTFrontMidLeft.out * MOTDTFrontMidLeft.reflected);
+		motorSet(MOTDTMidLeft.port, MOTDTMidLeft.out * MOTDTMidLeft.reflected);
+		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
+		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
+		motorSet(MOTDTFrontMidRight.port, MOTDTFrontMidRight.out * MOTDTFrontMidRight.reflected);
+		motorSet(MOTDTMidRight.port, MOTDTMidRight.out * MOTDTMidRight.reflected);
+		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
+
+		motorSet(MOTARMFront.port, MOTARMFront.out * MOTARMFront.reflected);
+		motorSet(MOTARMBack.port, MOTARMBack.out * MOTARMBack.reflected);
+		motorSet(MOTARMTop.port, MOTARMTop.out * MOTARMTop.reflected);
+		motorSet(MOTARMMiddle.port, MOTARMMiddle.out * MOTARMMiddle.reflected);
+		motorSet(MOTARMBottom.port, MOTARMBottom.out * MOTARMBottom.reflected);
+		motorSet(MOTARMLeft.port, MOTARMLeft.out * MOTARMLeft.reflected);
+		motorSet(MOTARMRight.port, MOTARMRight.out * MOTARMRight.reflected);
+		motorSet(MOTARMTopLeft.port, MOTARMTopLeft.out * MOTARMTopLeft.reflected);
+		motorSet(MOTARMTopRight.port, MOTARMTopRight.out * MOTARMTopRight.reflected);
+		motorSet(MOTARMBottomLeft.port, MOTARMBottomLeft.out * MOTARMBottomLeft.reflected);
+		motorSet(MOTARMBottomRight.port, MOTARMBottomRight.out * MOTARMBottomRight.reflected);
+
+		motorSet(MOTCOL.port, MOTCOL.out * MOTCOL.reflected);
+		motorSet(MOTCOLLeft.port, MOTCOLLeft.out * MOTCOLLeft.reflected);
+		motorSet(MOTCOLRight.port, MOTCOLRight.out * MOTCOLRight.reflected);
+
+		updateRicencoder(&EncARMLeft);
+		updateRicencoder(&EncARMRight);
+		updateRicencoder(&EncDTLeft);
+		updateRicencoder(&EncDTRight);
+
+		updateRicepot(&PotARMFront);
+
+		updateRicegyro(&gyro);
+//	}
 }
