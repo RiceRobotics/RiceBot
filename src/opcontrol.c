@@ -54,31 +54,6 @@
 void operatorControl() {
 
 	while (1) {
-		getJoystickForDriveTrain();
-		if(joystickGetDigital(1, 6, JOY_UP)) {
-		}
-		else if(joystickGetDigital(1, 6, JOY_DOWN)) {
-		}
-		else if(joystickGetDigital(1, 8, JOY_UP)) {
-		}
-		else if(joystickGetDigital(1, 8, JOY_DOWN)) {
-		}
-		else if(joystickGetDigital(1, 8, JOY_RIGHT)) {
-		}
-		else if(joystickGetDigital(1, 8, JOY_LEFT)) {
-		}
-		else if(joystickGetDigital(1, 7, JOY_UP)) {
-		}
-		else if(joystickGetDigital(1, 7, JOY_DOWN)) {
-		}
-		else {
-		}
-		if(joystickGetDigital(1, 5, JOY_UP)) {
-		}
-		else if(joystickGetDigital(1, 5, JOY_DOWN)) {
-		}
-		else {
-		}
 		delay(20);
 	}
 }
