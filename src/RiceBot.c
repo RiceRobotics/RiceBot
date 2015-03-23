@@ -10,7 +10,7 @@
  * Author: Keiko Kaplan
  */
 
-#include "main.h"
+#include "RiceBot.h"
 
 /*
  * Initializes a Motor type
@@ -20,12 +20,18 @@
  *
  * @return The initialized and configured motor
  */
-Motor initMotor(unsigned char port, int reflected) {
+Motor* initMotor(unsigned char port, int reflected, char location) {
 	Motor *m = malloc(sizeof(Motor));
 	m->port = port;
 	m->out = 0;
 	m->reflected = reflected;
-	return *m;
+	if(location == 'D') {
+		motorVectorAppend(DTMotors, m);
+	}
+	if(location == 'A') {
+		motorVectorAppend(ARMMotors, m);
+	}
+	return m;
 }
 
 /*
@@ -90,32 +96,32 @@ Ricencoder initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char 
 Ricencoder initRicencoderIME(float ticksPerRev, int mult, unsigned char imeAddress,
 		bool reverse) {
 	Ricencoder *r = malloc(sizeof(Ricencoder));
-		r->rawValue = 0;
-		r->ticksPerRev = ticksPerRev;
-		r->mult = mult;
-		r->adjustedValue = 0;
-		r->isIME = 1;
-		r->imeAddress = imeAddress;
-		r->portTop = 0;
-		r->portBot = 0;
-		r->reverse = reverse;
-		return *r;
+	r->rawValue = 0;
+	r->ticksPerRev = ticksPerRev;
+	r->mult = mult;
+	r->adjustedValue = 0;
+	r->isIME = 1;
+	r->imeAddress = imeAddress;
+	r->portTop = 0;
+	r->portBot = 0;
+	r->reverse = reverse;
+	return *r;
 }
 
 Ricencoder initRicencoderQUAD(float ticksPerRev, int mult, unsigned char portTop,
 		unsigned char portBot, bool reverse) {
 	Ricencoder *r = malloc(sizeof(Ricencoder));
-		r->rawValue = 0;
-		r->ticksPerRev = ticksPerRev;
-		r->mult = mult;
-		r->adjustedValue = 0;
-		r->isIME = 0;
-		r->imeAddress = 0;
-		r->portTop = portTop;
-		r->portBot = portBot;
-		r->reverse = reverse;
-		r->enc = encoderInit(portTop, portBot, reverse);
-		return *r;
+	r->rawValue = 0;
+	r->ticksPerRev = ticksPerRev;
+	r->mult = mult;
+	r->adjustedValue = 0;
+	r->isIME = 0;
+	r->imeAddress = 0;
+	r->portTop = portTop;
+	r->portBot = portBot;
+	r->reverse = reverse;
+	r->enc = encoderInit(portTop, portBot, reverse);
+	return *r;
 }
 
 /*
@@ -163,12 +169,47 @@ void riceBotInitializeIO() {
  * After, be sure to reinitialize each motor you will be using on your robot.
  */
 void riceBotInitialize() {
+	MOTDefault = initMotor(0, 1, ' ');
+//	printf("MOTDefault: %p\n\r", MOTDefault);
+//	printf("MOTDTFront: %p\n\r", MOTDTFront);
+	MOTDTFront = MOTDefault;
+//	printf("MOTDTFront: %p\n\r", MOTDTFront);
+	MOTDTFrontRight = MOTDefault;
+	MOTDTFrontMidRight = MOTDefault;
+	MOTDTMidRight = MOTDefault;
+	MOTDTBackRight = MOTDefault;
+	MOTDTFrontLeft = MOTDefault;
+	MOTDTFrontMidLeft = MOTDefault;
+	MOTDTMidLeft = MOTDefault;
+	MOTDTBackLeft = MOTDefault;
+	MOTDTBack = MOTDefault;
 
-	//	ENCDTLeft = encoderInit(0, 0, false);
-	//	ENCDTRight = encoderInit(0, 0, false);
-	//	ENCARMLeft = encoderInit(0, 0, false);
-	//	ENCARMRight = encoderInit(0, 0, false);
+	MOTARMFront = MOTDefault;
+	MOTARMBack = MOTDefault;
+	MOTARMTop = MOTDefault;
+	MOTARMMiddle = MOTDefault;
+	MOTARMBottom = MOTDefault;
+	MOTARMLeft = MOTDefault;
+	MOTARMRight = MOTDefault;
+	MOTARMTopRight = MOTDefault;
+	MOTARMBottomRight = MOTDefault;
+	MOTARMTopLeft = MOTDefault;
+	MOTARMBottomLeft = MOTDefault;
+	MOTARMOuterLeft = MOTDefault;
+	MOTARMOuterRight = MOTDefault;
+	MOTARMInnerLeft = MOTDefault;
+	MOTARMInnerRight = MOTDefault;
 
+	MOTCOL = MOTDefault;
+	MOTCOLLeft = MOTDefault;
+	MOTCOLRight = MOTDefault;
+
+	MOTCLAW = MOTDefault;
+
+
+
+	DTMotors = initMotorVector();
+	ARMMotors = initMotorVector();
 }
 
 /*
@@ -182,61 +223,71 @@ void riceBotInitialize() {
  *	 	 			HDRIVE
  */
 void getJoystickForDriveTrain() {
+//	printf("Get Joystick\n\r");
 	int x1 = joystickGetAnalog(1, 4);
 	int y1 = joystickGetAnalog(1, 3);
 	int x2 = joystickGetAnalog(1, 1);
 	int y2 = joystickGetAnalog(1, 2);
 	int left, right, norm;
 
+//	printf("Joysticks Gotten\n\r");
+
 	switch(controlStyle) {
 	case CTTANKDRIVE:
-		MOTDTFrontLeft.out = y1;
-		MOTDTFrontMidLeft.out = y1;
-		MOTDTMidLeft.out = y1;
-		MOTDTBackLeft.out = y1;
+		MOTDTFrontLeft->out = y1;
+		MOTDTFrontMidLeft->out = y1;
+		MOTDTMidLeft->out = y1;
+		MOTDTBackLeft->out = y1;
 
-		MOTDTFrontRight.out = y2;
-		MOTDTFrontMidRight.out = y2;
-		MOTDTMidRight.out = y2;
-		MOTDTBackRight.out = y2;
+		MOTDTFrontRight->out = y2;
+		MOTDTFrontMidRight->out = y2;
+		MOTDTMidRight->out = y2;
+		MOTDTBackRight->out = y2;
 		break;
 	case CTARCADEDRIVE:
 		left = y1 + x1;
 		right = y1 - x1;
 		norm = normalize(left, right);
 
-		MOTDTFrontLeft.out = left * norm;
-		MOTDTFrontMidLeft.out = left * norm;
-		MOTDTMidLeft.out = left * norm;
-		MOTDTBackLeft.out = left * norm;
+		MOTDTFrontLeft->out = left * norm;
+		MOTDTFrontMidLeft->out = left * norm;
+		MOTDTMidLeft->out = left * norm;
+		MOTDTBackLeft->out = left * norm;
 
-		MOTDTFrontRight.out = right * norm;
-		MOTDTFrontMidRight.out = right * norm;
-		MOTDTMidRight.out = right * norm;
-		MOTDTBackRight.out = (right * norm);
+		MOTDTFrontRight->out = right * norm;
+		MOTDTFrontMidRight->out = right * norm;
+		MOTDTMidRight->out = right * norm;
+		MOTDTBackRight->out = (right * norm);
 		break;
 	case CTCHEEZYDRIVE:
 		left = y1 + x2;
 		right = y1 - x2;
 		norm = normalize(left, right);
 
-		MOTDTFrontLeft.out = left * norm;
-		MOTDTFrontMidLeft.out = left * norm;
-		MOTDTMidLeft.out = left * norm;
-		MOTDTBackLeft.out = left * norm;
+//		motorVectorGet(DTMotors, 0)->out = left * norm;
+//		MOTDTFrontLeft->out = left * norm;
+		MOTDTFrontLeft->out = left * norm;
+//		printf("1");
+//		MOTDTFrontMidLeft->out = left * norm;
+//		MOTDTMidLeft->out = left * norm;
+		MOTDTBackLeft->out = left * norm;
+//		printf("2");
 
-		MOTDTFrontRight.out = right * norm;
-		MOTDTFrontMidRight.out = right * norm;
-		MOTDTMidRight.out = right * norm;
-		MOTDTBackRight.out = (right * norm);
+		MOTDTFrontRight->out = right * norm;
+//		printf("3");
+//		MOTDTFrontMidRight->out = right * norm;
+//		MOTDTMidRight->out = right * norm;
+		MOTDTBackRight->out = (right * norm);
+//		printf("4");
+//		printf("%d, %d\n\r", MOTDTFrontLeft->out, (motorVectorGet(DTMotors, 0))->out);
 		break;
 
 	case CTMECANUMDRIVE:
-		MOTDTFrontLeft.out = y1 + x2 + x1;
-		MOTDTBackLeft.out = y1 + x2 - x1;
+		MOTDTFrontLeft->out = y1 + x2 + x1;
+		MOTDTBackLeft->out = y1 + x2 - x1;
 
-		MOTDTFrontRight.out = y1 - x2 - x1;
-		MOTDTBackRight.out = y1 - x2 + x1;
+		MOTDTFrontRight->out = y1 - x2 - x1;
+		MOTDTBackRight->out = y1 - x2 + x1;
 		break;
 	case CTHDRIVE:
 	default:
@@ -256,39 +307,39 @@ void getJoystickForDriveTrain() {
  * 					HDRIVE
  * 					SWERVE
  */
-void setDriveTrainMotors() {
-	switch(driveTrainStyle) {
-	case DTFOURWHEELS:
-		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
-		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
-
-		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
-		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
-		break;
-	case DTSIXWHEELS:
-		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
-		motorSet(MOTDTMidLeft.port, MOTDTMidLeft.out * MOTDTMidLeft.reflected);
-		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
-
-		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
-		motorSet(MOTDTMidRight.port, MOTDTMidRight.out * MOTDTMidRight.reflected);
-		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
-		break;
-	case DTEIGHTWHEELS:
-		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
-		motorSet(MOTDTFrontMidLeft.port, MOTDTFrontMidLeft.out * MOTDTFrontMidLeft.reflected);
-		motorSet(MOTDTMidLeft.port, MOTDTMidLeft.out * MOTDTMidLeft.reflected);
-		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
-
-		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
-		motorSet(MOTDTFrontMidRight.port, MOTDTFrontMidRight.out * MOTDTFrontMidRight.reflected);
-		motorSet(MOTDTMidRight.port, MOTDTMidRight.out * MOTDTMidRight.reflected);
-		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
-		break;
-	default:
-		break;
-	}
-}
+//void setDriveTrainMotors() {
+//	switch(driveTrainStyle) {
+//	case DTFOURWHEELS:
+//		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
+//		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
+//
+//		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
+//		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
+//		break;
+//	case DTSIXWHEELS:
+//		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
+//		motorSet(MOTDTMidLeft.port, MOTDTMidLeft.out * MOTDTMidLeft.reflected);
+//		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
+//
+//		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
+//		motorSet(MOTDTMidRight.port, MOTDTMidRight.out * MOTDTMidRight.reflected);
+//		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
+//		break;
+//	case DTEIGHTWHEELS:
+//		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
+//		motorSet(MOTDTFrontMidLeft.port, MOTDTFrontMidLeft.out * MOTDTFrontMidLeft.reflected);
+//		motorSet(MOTDTMidLeft.port, MOTDTMidLeft.out * MOTDTMidLeft.reflected);
+//		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
+//
+//		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
+//		motorSet(MOTDTFrontMidRight.port, MOTDTFrontMidRight.out * MOTDTFrontMidRight.reflected);
+//		motorSet(MOTDTMidRight.port, MOTDTMidRight.out * MOTDTMidRight.reflected);
+//		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
+//		break;
+//	default:
+//		break;
+//	}
+//}
 
 /*
  * Updates the value of any Ricencoder based on a pointer to the struct
@@ -336,14 +387,14 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 	switch(instruction) {
 	case AUTODRIVETIME:
 		while(millis() < startTime + timeout) {
-			MOTDTFrontRight.out = power[1];
-			MOTDTFrontMidRight.out = power[1];
-			MOTDTMidRight.out = power[1];
-			MOTDTBackRight.out = power[1];
-			MOTDTFrontLeft.out = power[0];
-			MOTDTFrontMidLeft.out = power[0];
-			MOTDTMidLeft.out = power[0];
-			MOTDTBackLeft.out = power[0];
+			MOTDTFrontRight->out = power[1];
+			MOTDTFrontMidRight->out = power[1];
+			MOTDTMidRight->out = power[1];
+			MOTDTBackRight->out = power[1];
+			MOTDTFrontLeft->out = power[0];
+			MOTDTFrontMidLeft->out = power[0];
+			MOTDTMidLeft->out = power[0];
+			MOTDTBackLeft->out = power[0];
 		}
 		break;
 	case AUTODRIVEBASIC:
@@ -359,14 +410,14 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 				}
 			}
 
-			MOTDTFrontRight.out = power[1];
-			MOTDTFrontMidRight.out = power[1];
-			MOTDTMidRight.out = power[1];
-			MOTDTBackRight.out = power[1];
-			MOTDTFrontLeft.out = power[0];
-			MOTDTFrontMidLeft.out = power[0];
-			MOTDTMidLeft.out = power[0];
-			MOTDTBackLeft.out = power[0];
+			MOTDTFrontRight->out = power[1];
+			MOTDTFrontMidRight->out = power[1];
+			MOTDTMidRight->out = power[1];
+			MOTDTBackRight->out = power[1];
+			MOTDTFrontLeft->out = power[0];
+			MOTDTFrontMidLeft->out = power[0];
+			MOTDTMidLeft->out = power[0];
+			MOTDTBackLeft->out = power[0];
 
 			delay(20);
 			currentEnc[0] = EncDTLeft.rawValue;
@@ -379,27 +430,27 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		if(gyro.value < target) {		//Left Turn
 			while(gyro.value < target && millis() < startTime + timeout) {
 				printf("Left Turn! Target: %d, Current: %d\n\r", target, gyro.value);
-				MOTDTFrontRight.out = pow;
-				MOTDTFrontMidRight.out = pow;
-				MOTDTMidRight.out = pow;
-				MOTDTBackRight.out = pow;
-				MOTDTFrontLeft.out = -pow;
-				MOTDTFrontMidLeft.out = -pow;
-				MOTDTMidLeft.out = -pow;
-				MOTDTBackLeft.out = -pow;
+				MOTDTFrontRight->out = pow;
+				MOTDTFrontMidRight->out = pow;
+				MOTDTMidRight->out = pow;
+				MOTDTBackRight->out = pow;
+				MOTDTFrontLeft->out = -pow;
+				MOTDTFrontMidLeft->out = -pow;
+				MOTDTMidLeft->out = -pow;
+				MOTDTBackLeft->out = -pow;
 			}
 		}
 		else if(gyro.value > target) {	//Right Turn
 			while(gyro.value > target && millis() < startTime + timeout) {
 				printf("Right Turn! Target: %d, Current: %d\n\r", target, gyro.value);
-				MOTDTFrontRight.out = -pow;
-				MOTDTFrontMidRight.out = -pow;
-				MOTDTMidRight.out = -pow;
-				MOTDTBackRight.out = -pow;
-				MOTDTFrontLeft.out = pow;
-				MOTDTFrontMidLeft.out = pow;
-				MOTDTMidLeft.out = pow;
-				MOTDTBackLeft.out = pow;
+				MOTDTFrontRight->out = -pow;
+				MOTDTFrontMidRight->out = -pow;
+				MOTDTMidRight->out = -pow;
+				MOTDTBackRight->out = -pow;
+				MOTDTFrontLeft->out = pow;
+				MOTDTFrontMidLeft->out = pow;
+				MOTDTMidLeft->out = pow;
+				MOTDTBackLeft->out = pow;
 			}
 		}
 		break;
@@ -418,14 +469,14 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 				}
 			}
 
-			MOTDTFrontRight.out = power[1];
-			MOTDTFrontMidRight.out = power[1];
-			MOTDTMidRight.out = power[1];
-			MOTDTBackRight.out = power[1];
-			MOTDTFrontLeft.out = power[0];
-			MOTDTFrontMidLeft.out = power[0];
-			MOTDTMidLeft.out = power[0];
-			MOTDTBackLeft.out = power[0];
+			MOTDTFrontRight->out = power[1];
+			MOTDTFrontMidRight->out = power[1];
+			MOTDTMidRight->out = power[1];
+			MOTDTBackRight->out = power[1];
+			MOTDTFrontLeft->out = power[0];
+			MOTDTFrontMidLeft->out = power[0];
+			MOTDTMidLeft->out = power[0];
+			MOTDTBackLeft->out = power[0];
 
 			delay(20);
 			currentEnc[0] = EncDTLeft.adjustedValue;
@@ -434,32 +485,32 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		break;
 	case AUTOCOLLECTORS:
 		if(timeout == NULL) {
-			MOTCOL.out = pow;
-			MOTCOLLeft.out = pow;
-			MOTCOLRight.out = pow;
+			MOTCOL->out = pow;
+			MOTCOLLeft->out = pow;
+			MOTCOLRight->out = pow;
 		}
 		else {
 			while (millis() < startTime + timeout) {
-				MOTCOL.out = pow;
-				MOTCOLLeft.out = pow;
-				MOTCOLRight.out = pow;
+				MOTCOL->out = pow;
+				MOTCOLLeft->out = pow;
+				MOTCOLRight->out = pow;
 			}
-			MOTCOL.out = 0;
-			MOTCOLLeft.out = 0;
-			MOTCOLRight.out = 0;
+			MOTCOL->out = 0;
+			MOTCOLLeft->out = 0;
+			MOTCOLRight->out = 0;
 		}
 		break;
 	case AUTOARMTIME:
 		PidARMLeft.running = 0;
 		PidARMRight.running = 0;
 		if(timeout == NULL) {
-			MOTARMBottomLeft.out = pow;
-			MOTARMBottomRight.out = pow;
+			MOTARMBottomLeft->out = pow;
+			MOTARMBottomRight->out = pow;
 		}
 		else {
 			while (millis() < startTime + timeout) {
-				MOTARMBottomLeft.out = pow;
-				MOTARMBottomRight.out = pow;
+				MOTARMBottomLeft->out = pow;
+				MOTARMBottomRight->out = pow;
 			}
 			PidARMLeft.running = 1;
 			PidARMRight.running = 1;
@@ -469,49 +520,49 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		break;
 	case AUTOCLAW:
 		if(timeout == NULL) {
-			MOTCLAW.out = pow;
+			MOTCLAW->out = pow;
 		}
 		else {
 			while (millis() < startTime + timeout) {
-				MOTCLAW.out = pow;
+				MOTCLAW->out = pow;
 			}
-			MOTCLAW.out = 0;
+			MOTCLAW->out = 0;
 		}
 		break;
 	case AUTOTURNTIME:
 		target = distance;
 		if(target > 0) {		//Left Turn
 			while(millis() < startTime + timeout) {
-				MOTDTFrontRight.out = pow;
-				MOTDTFrontMidRight.out = pow;
-				MOTDTMidRight.out = pow;
-				MOTDTBackRight.out = pow;
-				MOTDTFrontLeft.out = -pow;
-				MOTDTFrontMidLeft.out = -pow;
-				MOTDTMidLeft.out = -pow;
-				MOTDTBackLeft.out = -pow;
+				MOTDTFrontRight->out = pow;
+				MOTDTFrontMidRight->out = pow;
+				MOTDTMidRight->out = pow;
+				MOTDTBackRight->out = pow;
+				MOTDTFrontLeft->out = -pow;
+				MOTDTFrontMidLeft->out = -pow;
+				MOTDTMidLeft->out = -pow;
+				MOTDTBackLeft->out = -pow;
 			}
 		}
 		else if(target < 0) {	//Right Turn
 			while(millis() < startTime + timeout) {
-				MOTDTFrontRight.out = -pow;
-				MOTDTFrontMidRight.out = -pow;
-				MOTDTMidRight.out = -pow;
-				MOTDTBackRight.out = -pow;
-				MOTDTFrontLeft.out = pow;
-				MOTDTFrontMidLeft.out = pow;
-				MOTDTMidLeft.out = pow;
-				MOTDTBackLeft.out = pow;
+				MOTDTFrontRight->out = -pow;
+				MOTDTFrontMidRight->out = -pow;
+				MOTDTMidRight->out = -pow;
+				MOTDTBackRight->out = -pow;
+				MOTDTFrontLeft->out = pow;
+				MOTDTFrontMidLeft->out = pow;
+				MOTDTMidLeft->out = pow;
+				MOTDTBackLeft->out = pow;
 			}
 		}
-		MOTDTFrontRight.out = 0;
-		MOTDTFrontMidRight.out = 0;
-		MOTDTMidRight.out = 0;
-		MOTDTBackRight.out = 0;
-		MOTDTFrontLeft.out = 0;
-		MOTDTFrontMidLeft.out = 0;
-		MOTDTMidLeft.out = 0;
-		MOTDTBackLeft.out = 0;
+		MOTDTFrontRight->out = 0;
+		MOTDTFrontMidRight->out = 0;
+		MOTDTMidRight->out = 0;
+		MOTDTBackRight->out = 0;
+		MOTDTFrontLeft->out = 0;
+		MOTDTFrontMidLeft->out = 0;
+		MOTDTMidLeft->out = 0;
+		MOTDTBackLeft->out = 0;
 		break;
 	default:
 		break;
@@ -568,14 +619,14 @@ int normalize(int left, int right) {
 }
 
 void DTStopMotors() {
-	MOTDTFrontRight.out = 0;
-	MOTDTFrontMidRight.out = 0;
-	MOTDTMidRight.out = 0;
-	MOTDTBackRight.out = 0;
-	MOTDTFrontLeft.out = 0;
-	MOTDTFrontMidLeft.out = 0;
-	MOTDTMidLeft.out = 0;
-	MOTDTBackLeft.out = 0;
+	MOTDTFrontRight->out = 0;
+	MOTDTFrontMidRight->out = 0;
+	MOTDTMidRight->out = 0;
+	MOTDTBackRight->out = 0;
+	MOTDTFrontLeft->out = 0;
+	MOTDTFrontMidLeft->out = 0;
+	MOTDTMidLeft->out = 0;
+	MOTDTBackLeft->out = 0;
 }
 
 /*
@@ -622,31 +673,27 @@ int max4(int a, int b, int c, int d) {
 	return max(max(max(a, b), c), d);
 }
 
-void IOTask() {
-		motorSet(MOTDTFrontLeft.port, MOTDTFrontLeft.out * MOTDTFrontLeft.reflected);
-		motorSet(MOTDTFrontMidLeft.port, MOTDTFrontMidLeft.out * MOTDTFrontMidLeft.reflected);
-		motorSet(MOTDTMidLeft.port, MOTDTMidLeft.out * MOTDTMidLeft.reflected);
-		motorSet(MOTDTBackLeft.port, MOTDTBackLeft.out * MOTDTBackLeft.reflected);
-		motorSet(MOTDTFrontRight.port, MOTDTFrontRight.out * MOTDTFrontRight.reflected);
-		motorSet(MOTDTFrontMidRight.port, MOTDTFrontMidRight.out * MOTDTFrontMidRight.reflected);
-		motorSet(MOTDTMidRight.port, MOTDTMidRight.out * MOTDTMidRight.reflected);
-		motorSet(MOTDTBackRight.port, MOTDTBackRight.out * MOTDTBackRight.reflected);
+void IOTask(void *ignore) {
+	while(1) {
+		for(int i = 0; i < DTMotors->elem_current; i++) {
+			motorSet(motorVectorGet(DTMotors, i)->port, motorVectorGet(DTMotors, i)->out * motorVectorGet(DTMotors, i)->reflected);
+		}
 
-		motorSet(MOTARMFront.port, MOTARMFront.out * MOTARMFront.reflected);
-		motorSet(MOTARMBack.port, MOTARMBack.out * MOTARMBack.reflected);
-		motorSet(MOTARMTop.port, MOTARMTop.out * MOTARMTop.reflected);
-		motorSet(MOTARMMiddle.port, MOTARMMiddle.out * MOTARMMiddle.reflected);
-		motorSet(MOTARMBottom.port, MOTARMBottom.out * MOTARMBottom.reflected);
-		motorSet(MOTARMLeft.port, MOTARMLeft.out * MOTARMLeft.reflected);
-		motorSet(MOTARMRight.port, MOTARMRight.out * MOTARMRight.reflected);
-		motorSet(MOTARMTopLeft.port, MOTARMTopLeft.out * MOTARMTopLeft.reflected);
-		motorSet(MOTARMTopRight.port, MOTARMTopRight.out * MOTARMTopRight.reflected);
-		motorSet(MOTARMBottomLeft.port, MOTARMBottomLeft.out * MOTARMBottomLeft.reflected);
-		motorSet(MOTARMBottomRight.port, MOTARMBottomRight.out * MOTARMBottomRight.reflected);
+		motorSet(MOTARMFront->port, MOTARMFront->out * MOTARMFront->reflected);
+		motorSet(MOTARMBack->port, MOTARMBack->out * MOTARMBack->reflected);
+		motorSet(MOTARMTop->port, MOTARMTop->out * MOTARMTop->reflected);
+		motorSet(MOTARMMiddle->port, MOTARMMiddle->out * MOTARMMiddle->reflected);
+		motorSet(MOTARMBottom->port, MOTARMBottom->out * MOTARMBottom->reflected);
+		motorSet(MOTARMLeft->port, MOTARMLeft->out * MOTARMLeft->reflected);
+		motorSet(MOTARMRight->port, MOTARMRight->out * MOTARMRight->reflected);
+		motorSet(MOTARMTopLeft->port, MOTARMTopLeft->out * MOTARMTopLeft->reflected);
+		motorSet(MOTARMTopRight->port, MOTARMTopRight->out * MOTARMTopRight->reflected);
+		motorSet(MOTARMBottomLeft->port, MOTARMBottomLeft->out * MOTARMBottomLeft->reflected);
+		motorSet(MOTARMBottomRight->port, MOTARMBottomRight->out * MOTARMBottomRight->reflected);
 
-		motorSet(MOTCOL.port, MOTCOL.out * MOTCOL.reflected);
-		motorSet(MOTCOLLeft.port, MOTCOLLeft.out * MOTCOLLeft.reflected);
-		motorSet(MOTCOLRight.port, MOTCOLRight.out * MOTCOLRight.reflected);
+		motorSet(MOTCOL->port, MOTCOL->out * MOTCOL->reflected);
+		motorSet(MOTCOLLeft->port, MOTCOLLeft->out * MOTCOLLeft->reflected);
+		motorSet(MOTCOLRight->port, MOTCOLRight->out * MOTCOLRight->reflected);
 
 		updateRicencoder(&EncARMLeft);
 		updateRicencoder(&EncARMRight);
@@ -656,4 +703,43 @@ void IOTask() {
 		updateRicepot(&PotARMFront);
 
 		updateRicegyro(&gyro);
+		delay(10);
+	}
 }
+
+motorVector* initMotorVector() {
+	motorVector* vect = malloc(sizeof(motorVector));
+	vect->elem_total = 10;
+	vect->elem_current = 0;
+
+	return vect;
+}
+
+int motorVectorAppend(motorVector* vect, Motor* element) {
+	vect->data[vect->elem_current] = element;
+	vect->elem_current++;
+	if(vect->elem_current >= vect->elem_total) {
+		Motor* new_data = realloc(vect->data, (vect->elem_total * 2) * sizeof(Motor));
+		if(new_data) {
+			*(vect->data) = new_data;
+			vect->elem_total *= 2;
+		} else {
+			printf("Error allocating memory");
+			free(vect->data);
+			return 0;
+		}
+	}
+	return 1;
+}
+
+Motor* motorVectorGet(motorVector* vect, int index) {
+	Motor* return_elem;
+	if(index < vect->elem_current && index >= 0) {
+		return_elem = vect->data[index];
+	} else {
+		printf("Index not in vector");
+		exit(EXIT_FAILURE);
+	}
+	return return_elem;
+}
+

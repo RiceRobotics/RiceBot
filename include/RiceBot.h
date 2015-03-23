@@ -8,7 +8,7 @@
 #ifndef RICEBOT_H_
 #define RICEBOT_H_
 
-#include "main.h"
+#include <API.h>
 
 //Constants
 #define MATH_PI 3.14159265358979323846
@@ -150,43 +150,61 @@ typedef struct RicegyroStruct {
 	unsigned short multiplier;
 } Ricegyro;
 
+/*
+ * Struct representing a dynamic array of int elements.
+ */
+typedef struct motorVector {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Motor* data[]; /* Pointer to actual array of data */
+} motorVector;
+
+//Default Motor
+Motor* MOTDefault;
+
 //Declaration of all possible Drivetrain motors
-Motor MOTDTFront;
-Motor MOTDTFrontRight;
-Motor MOTDTFrontMidRight;
-Motor MOTDTMidRight;
-Motor MOTDTBackRight;
-Motor MOTDTFrontLeft;
-Motor MOTDTFrontMidLeft;
-Motor MOTDTMidLeft;
-Motor MOTDTBackLeft;
-Motor MOTDTBack;
+Motor* MOTDTFront;
+Motor* MOTDTFrontRight;
+Motor* MOTDTFrontMidRight;
+Motor* MOTDTMidRight;
+Motor* MOTDTBackRight;
+Motor* MOTDTFrontLeft;
+Motor* MOTDTFrontMidLeft;
+Motor* MOTDTMidLeft;
+Motor* MOTDTBackLeft;
+Motor* MOTDTBack;
+
+//Vector of Drivetrain motors
+motorVector* DTMotors;
 
 //Declaration of all possible Arm motors
 //This is just to make the code more understandable when comparing an arm motor
 //name to the physical motor on the robot
-Motor MOTARMFront;
-Motor MOTARMBack;
-Motor MOTARMTop;
-Motor MOTARMMiddle;
-Motor MOTARMBottom;
-Motor MOTARMLeft;
-Motor MOTARMRight;
-Motor MOTARMTopRight;
-Motor MOTARMBottomRight;
-Motor MOTARMTopLeft;
-Motor MOTARMBottomLeft;
-Motor MOTARMOuterLeft;
-Motor MOTARMOuterRight;
-Motor MOTARMInnerLeft;
-Motor MOTARMInnerRight;
+Motor* MOTARMFront;
+Motor* MOTARMBack;
+Motor* MOTARMTop;
+Motor* MOTARMMiddle;
+Motor* MOTARMBottom;
+Motor* MOTARMLeft;
+Motor* MOTARMRight;
+Motor* MOTARMTopRight;
+Motor* MOTARMBottomRight;
+Motor* MOTARMTopLeft;
+Motor* MOTARMBottomLeft;
+Motor* MOTARMOuterLeft;
+Motor* MOTARMOuterRight;
+Motor* MOTARMInnerLeft;
+Motor* MOTARMInnerRight;
+
+//Vector of Arm motors
+motorVector* ARMMotors;
 
 //Declaration of all possible Collector motors
-Motor MOTCOL;
-Motor MOTCOLLeft;
-Motor MOTCOLRight;
+Motor* MOTCOL;
+Motor* MOTCOLLeft;
+Motor* MOTCOLRight;
 
-Motor MOTCLAW;
+Motor* MOTCLAW;
 
 unsigned char IMEDTLEFT;
 unsigned char IMEDTRIGHT;
@@ -217,7 +235,7 @@ Pid PidARMFront;
 Pid PidARMTop;
 Pid PidARMBottom;
 
-Motor initMotor(unsigned char port, int reflected);
+Motor* initMotor(unsigned char port, int reflected, char location);
 
 Pid initPid(float kP, float kI, float kD);
 
@@ -258,8 +276,7 @@ int normalize(int left, int right);
 
 void DTStopMotors();
 
-void startIOTask(void *ignore);
-void IOTask();
+void IOTask(void *ignore);
 
 void startPidTask(void *ignore);
 
@@ -268,5 +285,11 @@ int max(int a, int b);
 int min(int a, int b);
 
 int max4(int a, int b, int c, int d);
+
+motorVector* initMotorVector(); //Initalizes a vector
+
+int motorVectorAppend(motorVector* vect, Motor* element); //Adds an element to the vector. Returns 1 if successful and 0 otherwise
+
+Motor* motorVectorGet(motorVector* vect, int index); //Returns the element at a given index. Returns -1 if no element at index.
 
 #endif /* RICEBOT_H_ */

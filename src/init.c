@@ -87,62 +87,28 @@ void initialize() {
 	//	PidARMRight.running = 1;
 	//	PidARMFront.running = 1;
 
-	taskCreate(startIOTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_HIGHEST);
+	taskCreate(IOTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_HIGHEST);
 	taskCreate(startPidTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
 
 }
-void startIOTask(void *ignore) {
-	while(1) {
-		setDriveTrainMotors();
-
-		motorSet(MOTARMFront.port, MOTARMFront.out * MOTARMFront.reflected);
-		motorSet(MOTARMBack.port, MOTARMBack.out * MOTARMBack.reflected);
-		motorSet(MOTARMTop.port, MOTARMTop.out * MOTARMTop.reflected);
-		motorSet(MOTARMMiddle.port, MOTARMMiddle.out * MOTARMMiddle.reflected);
-		motorSet(MOTARMBottom.port, MOTARMBottom.out * MOTARMBottom.reflected);
-		motorSet(MOTARMLeft.port, MOTARMLeft.out * MOTARMLeft.reflected);
-		motorSet(MOTARMRight.port, MOTARMRight.out * MOTARMRight.reflected);
-		motorSet(MOTARMTopLeft.port, MOTARMTopLeft.out * MOTARMTopLeft.reflected);
-		motorSet(MOTARMTopRight.port, MOTARMTopRight.out * MOTARMTopRight.reflected);
-		motorSet(MOTARMBottomLeft.port, MOTARMBottomLeft.out * MOTARMBottomLeft.reflected);
-		motorSet(MOTARMBottomRight.port, MOTARMBottomRight.out * MOTARMBottomRight.reflected);
-
-		motorSet(MOTCOL.port, MOTCOL.out * MOTCOL.reflected);
-		motorSet(MOTCOLLeft.port, MOTCOLLeft.out * MOTCOLLeft.reflected);
-		motorSet(MOTCOLRight.port, MOTCOLRight.out * MOTCOLRight.reflected);
-
-		PotARMFront.value = analogReadCalibrated(PotARMFront.port);
-		PotARMLeft.value = analogReadCalibrated(PotARMLeft.port);
-		PotARMRight.value = analogReadCalibrated(PotARMRight.port);
-
-		updateRicencoder(&EncDTLeft);
-		updateRicencoder(&EncARMRight);
-		updateRicencoder(&EncDTLeft);
-		updateRicencoder(&EncDTRight);
-
-//		updateRicegyro(gyro);
-
-		delay(10);
-	}
-}
 
 void startPidTask(void *ignore) {
-	while(1) {
-		//Manually add each pid loop here
-		processPid(&PidARMLeft, PotARMLeft.value);
-		processPid(&PidARMRight, PotARMRight.value);
-		processPid(&PidARMFront, PotARMFront.value);
-		if(PidARMLeft.running) {
-			MOTARMBottomLeft.out = PidARMLeft.output;
-		}
-		if(PidARMRight.running) {
-			MOTARMBottomRight.out = PidARMRight.output;
-		}
-		if(PidARMFront.running) {
-			MOTARMTopLeft.out = PidARMFront.output;
-			MOTARMBottomLeft.out = PidARMFront.output;
-		}
-
-		delay(20);
-	}
+//	while(1) {
+//		//Manually add each pid loop here
+//		processPid(&PidARMLeft, PotARMLeft.value);
+//		processPid(&PidARMRight, PotARMRight.value);
+//		processPid(&PidARMFront, PotARMFront.value);
+//		if(PidARMLeft.running) {
+//			MOTARMBottomLeft.out = PidARMLeft.output;
+//		}
+//		if(PidARMRight.running) {
+//			MOTARMBottomRight.out = PidARMRight.output;
+//		}
+//		if(PidARMFront.running) {
+//			MOTARMTopLeft.out = PidARMFront.output;
+//			MOTARMBottomLeft.out = PidARMFront.output;
+//		}
+//
+//		delay(20);
+//	}
 }
