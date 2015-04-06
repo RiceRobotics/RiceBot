@@ -59,16 +59,16 @@ void initializeIO() {
  * can be implemented in this task if desired.
  */
 void initialize() {
-	driveTrainStyle = DTFOURWHEELS;
-	controlStyle = CTCHEEZYDRIVE;
+//	driveTrainStyle = DTFOURWHEELS;
+//	controlStyle = CTCHEEZYDRIVE;
+//
+//	riceBotInitialize();
 
-	riceBotInitialize();
+//	MOTDTFrontLeft = initRicemotor(2, -1, 'D');
+//	MOTDTFrontRight = initRicemotor(7, -1, 'D');
+//	MOTDTBackLeft = initRicemotor(3, 1, 'D');
+//	MOTDTBackRight = initRicemotor(9, 1,'D');
 
-	//	MOTDTFrontLeft = initMotor(2, -1);
-	//	MOTDTFrontRight = initMotor(7, -1);
-	//	MOTDTBackLeft = initMotor(3, 1);
-	//	MOTDTBackRight = initMotor(9, 1);
-	//
 	//	MOTARMFront = initMotor(4, 1);
 	//	MOTARMBottomLeft = initMotor(5, 1);
 	//	MOTARMBottomRight = initMotor(8, -1);
@@ -78,7 +78,7 @@ void initialize() {
 	//	EncARMLeft = initRicencoder(627.2, 1, 1, 0, 0, NULL, 0);
 	//	EncARMRight = initRicencoder(627.2, 1, 1, 0, 0, NULL, 0);
 
-//	gyro = initRicegyro(1, 1);
+	//	gyro = initRicegyro(1, 1);
 	//
 	//	PidARMLeft = initPid(.2, 0, 0);
 	//	PidARMRight = initPid(.2, 0, 0);
@@ -88,11 +88,11 @@ void initialize() {
 	//	PidARMFront.running = 1;
 
 	taskCreate(IOTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_HIGHEST);
-	taskCreate(startPidTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
+	taskCreate(PidTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
 
 }
 
-void startPidTask(void *ignore) {
+//void startPidTask(void *ignore) {
 //	while(1) {
 //		//Manually add each pid loop here
 //		processPid(&PidARMLeft, PotARMLeft.value);
@@ -111,4 +111,4 @@ void startPidTask(void *ignore) {
 //
 //		delay(20);
 //	}
-}
+//}
