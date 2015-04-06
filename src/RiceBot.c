@@ -64,6 +64,7 @@ void riceBotInitialize() {
 	MOTCOLLeft = MOTDefault;
 	MOTCOLRight = MOTDefault;
 	MOTCLAW = MOTDefault;
+	MOTConveyor = MOTDefault;
 
 	Ricemotor* array[2] = {MOTDefault, MOTDefault};
 	PidDefault = initRicepid(0, 0, 0, 0, array);
@@ -84,6 +85,7 @@ void riceBotInitialize() {
 	EncARMRight = EncDefault;
 	EncARMBottom = EncDefault;
 	EncARMTop = EncDefault;
+	EncARMFront = EncDefault;
 
 	PotDefault = initRicepot(0, 0);
 	PotARMFront = PotDefault;

@@ -271,6 +271,7 @@ Ricemotor* MOTCOL;
 Ricemotor* MOTCOLLeft;
 Ricemotor* MOTCOLRight;
 Ricemotor* MOTCLAW;
+Ricemotor* MOTConveyor;
 
 ricemotorVector* MOTVector;
 //motorVector* DTMotorVector;
@@ -306,6 +307,7 @@ Ricencoder* EncARMLeft;
 Ricencoder* EncARMRight;
 Ricencoder* EncARMBottom;
 Ricencoder* EncARMTop;
+Ricencoder* EncARMFront;
 
 ricencoderVector* EncVector;
 
