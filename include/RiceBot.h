@@ -128,6 +128,17 @@ typedef struct RicesolenoidStruct {
 } Ricesolenoid;
 
 /*
+ * The Ricebutton is a wrapper for button and limit switch use
+ *
+ * @param port The digital port on the Cortex which the button is plugged into
+ * @param state The current state of the button, either HIGH (Released) or LOW (Pressed)
+ */
+typedef struct RicebuttonStruct {
+	unsigned char port;
+	int state;
+} Ricebutton;
+
+/*
  * The Motor Vector is a variable length array of Motor structs
  *
  * @param elem_total  Number of elements currently allocated for, initialized to 10
@@ -191,6 +202,19 @@ typedef struct ricesolenoidVector {
 	unsigned int elem_current; /* Current number of elements stored */
 	Ricesolenoid* data[]; /* Pointer to actual array of data */
 } ricesolenoidVector;
+
+/*
+ * The Ricebutton Vector is a variable length array of Ricebutton structs
+ *
+ * @param elem_total  Number of elements currently allocated for, initialized to 10
+ * @param elem_current Current number of elements stored
+ * @param data Pointer to actual array of data
+ */
+typedef struct ricebuttonVector {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Ricebutton* data[]; /* Pointer to actual array of data */
+} ricebuttonVector;
 
 //Constants
 #define MATH_PI 3.14159265358979323846
@@ -329,6 +353,14 @@ Ricesolenoid* SolClaw;
 
 ricesolenoidVector* SolVector;
 
+//Default Ricebutton
+Ricebutton* ButDefault;
+
+Ricebutton* ButLeft;
+Ricebutton* ButRight;
+
+ricebuttonVector* ButVector;
+
 //Prototyping of RiceStruct initialization functions
 
 Ricemotor* initRicemotor(unsigned char port, int reflected);
@@ -349,6 +381,8 @@ Ricepot* initRicepot(unsigned char port, int reversed);
 Ricegyro* initRicegyro(unsigned char port, unsigned short multiplier);
 
 Ricesolenoid* initRicesolenoid(unsigned char port, int state, int reversed);
+
+Ricebutton* initRicebutton(unsigned char port, int state);
 
 //Prototyping of all Vector-related functions
 
@@ -382,6 +416,12 @@ int ricesolenoidVectorAppend(ricesolenoidVector* vect, Ricesolenoid* element);
 
 Ricesolenoid* ricesolenoidVectorGet(ricesolenoidVector* vect, int index);
 
+ricebuttonVector* initRicebuttonVector();
+
+int ricebuttonVectorAppend(ricebuttonVector* vect, Ricebutton* element);
+
+Ricebutton* ricebuttonVectorGet(ricebuttonVector* vect, int index);
+
 //Prototyping of other functions
 
 void riceBotInitializeIO();
@@ -397,6 +437,10 @@ void updateRicencoder(Ricencoder *rc);
 void updateRicepot(Ricepot *rp);
 
 void updateRicegyro(Ricegyro *rg);
+
+void updateRicesolenoid(Ricesolenoid *rs);
+
+void updateRicebutton(Ricebutton *rb);
 
 void autonomousTask(int instruction, int distance, int pow, long timeout);
 
@@ -417,3 +461,5 @@ int min(int a, int b);
 int max4(int a, int b, int c, int d);
 
 #endif /* RICEBOT_H_ */
+
+//It works!

@@ -31,6 +31,7 @@ void riceBotInitialize() {
 	PidVector = initRicepidVector();
 	EncVector = initRicencoderVector();
 	PotVector = initRicepotVector();
+	ButVector = initRicebuttonVector();
 
 	MOTDefault = initRicemotor(0, 1);
 	MOTDTFront = MOTDefault;
@@ -92,14 +93,12 @@ void riceBotInitialize() {
 	PotARMLeft = PotDefault;
 	PotARMRight = PotDefault;
 
-	printf("Initialization complete\n\r");
-	printf("MOT: %d\n\r", MOTVector->elem_current);
-	printf("Pid: %d\n\r", PidVector->elem_current);
-	printf("Enc: %d\n\r", EncVector->elem_current);
-	printf("Pot: %d\n\r", PotVector->elem_current);
-	delay(1000);
+	ButDefault = initRicebutton(0, HIGH);
+	ButLeft = ButDefault;
+	ButRight = ButDefault;
 
 	imeInitializeAll();
+	printf("Initialization complete\n\r");
 }
 
 /*
@@ -279,6 +278,22 @@ Ricesolenoid* initRicesolenoid(unsigned char port, int state, int reversed) {
 }
 
 /*
+ * Initializes a Ricebutton
+ *
+ * @param port The port on the Cortex which the button or limit switch is plugged into
+ * @param state The current state of the button, either HIGH (Released) or LOW (Pressed)
+ *
+ * @return The initialized and configured Ricebutton
+ */
+Ricebutton* initRicebutton(unsigned char port, int state) {
+	Ricebutton *r = malloc(sizeof(Ricebutton));
+	r->port = port;
+	r->state = state;
+	ricebuttonVectorAppend(ButVector, r);
+	return r;
+}
+
+/*
  * Checks joystick input and sets all Motor structs to appropriate output
  */
 void getJoystickForDriveTrain() {
@@ -411,6 +426,12 @@ void updateRicepot(Ricepot *rp) {
 void updateRicegyro(Ricegyro *rg) {
 	if(rg != NULL) {
 		rg->value = gyroGet(rg->g);
+	}
+}
+
+void updateRicebutton(Ricebutton *rb) {
+	if(rb != NULL) {
+		rb->state = digitalRead(rb->port);
 	}
 }
 
@@ -1031,6 +1052,61 @@ int ricesolenoidVectorAppend(ricesolenoidVector* vect, Ricesolenoid* element) {
  */
 Ricesolenoid* ricesolenoidVectorGet(ricesolenoidVector* vect, int index) {
 	Ricesolenoid* return_elem;
+	if(index < vect->elem_current && index >= 0) {
+		return_elem = vect->data[index];
+	} else {
+		printf("Index not in vector");
+		exit(EXIT_FAILURE);
+	}
+	return return_elem;
+}
+
+/*
+ * Initializes a vector
+ */
+ricebuttonVector* initRicebuttonVector() {
+	ricebuttonVector* vect = malloc(sizeof(vect->elem_current) + sizeof(vect->elem_total) + 10*(sizeof(Ricebutton*)));
+	vect->elem_total = 10;
+	vect->elem_current = 0;
+
+	return vect;
+}
+
+/*
+ * Adds an element to the vector
+ *
+ * @param vect A pointer to the destination vector
+ * @param element A pointer to the new element
+ *
+ * @return 1 if successful and 0 otherwise
+ */
+int ricebuttonVectorAppend(ricebuttonVector* vect, Ricebutton* element) {
+	vect->data[vect->elem_current] = element;
+	vect->elem_current++;
+	if(vect->elem_current >= vect->elem_total) {
+		Ricebutton* new_data = realloc(vect->data, (vect->elem_total * 2) * sizeof(Ricebutton));
+		if(new_data) {
+			*(vect->data) = new_data;
+			vect->elem_total *= 2;
+		} else {
+			printf("Error allocating memory");
+			free(vect->data);
+			return 0;
+		}
+	}
+	return 1;
+}
+
+/*
+ * Returns the element at a given index
+ *
+ * @param vect A pointer to the destination vector
+ * @param index The index of the element to retrieve
+ *
+ * @return -1 if no element at index.
+ */
+Ricebutton* ricebuttonVectorGet(ricebuttonVector* vect, int index) {
+	Ricebutton* return_elem;
 	if(index < vect->elem_current && index >= 0) {
 		return_elem = vect->data[index];
 	} else {
