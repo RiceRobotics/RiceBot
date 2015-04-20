@@ -12,11 +12,10 @@
 
 #include "RiceBot.h"
 
-
 void riceBotInitializeIO() {
-	SolVector = initRicesolenoidVector();
-	SolDefault = initRicesolenoid(0, LOW, false);
-	SolClaw = SolDefault;
+//  SolVector = initRicesolenoidVector();
+//  SolDefault = initRicesolenoid(0, LOW, false);
+//  SolClaw = SolDefault;
 }
 
 /*
@@ -93,10 +92,13 @@ void riceBotInitialize() {
 	PotARMLeft = PotDefault;
 	PotARMRight = PotDefault;
 
-	ButDefault = initRicebutton(0, HIGH);
-	ButLeft = ButDefault;
-	ButRight = ButDefault;
-
+	ButDefault = initRicebutton(0);
+	ButConLeft = ButDefault;
+	ButConRight = ButDefault;
+	ButARMBase = ButDefault;
+	ButARMFrontLeft = ButDefault;
+	ButARMFrontRight = ButDefault;
+	
 	imeInitializeAll();
 	printf("Initialization complete\n\r");
 }
@@ -111,13 +113,11 @@ void riceBotInitialize() {
  */
 Ricemotor* initRicemotor(unsigned char port, int reflected) {
 	Ricemotor *m = malloc(sizeof(Ricemotor));
-	printf("New Motor at %p\n\r", m);
 	m->port = port;
 	m->out = 0;
 	m->reflected = reflected;
 
 	ricemotorVectorAppend(MOTVector, m);
-	printf("Motor appended; %d motors registered\n\r", MOTVector->elem_current);
 	return m;
 }
 
@@ -281,14 +281,14 @@ Ricesolenoid* initRicesolenoid(unsigned char port, int state, int reversed) {
  * Initializes a Ricebutton
  *
  * @param port The port on the Cortex which the button or limit switch is plugged into
- * @param state The current state of the button, either HIGH (Released) or LOW (Pressed)
  *
  * @return The initialized and configured Ricebutton
  */
-Ricebutton* initRicebutton(unsigned char port, int state) {
+Ricebutton* initRicebutton(unsigned char port) {
 	Ricebutton *r = malloc(sizeof(Ricebutton));
 	r->port = port;
-	r->state = state;
+	pinMode(port, INPUT);
+	r->state = digitalRead(port);
 	ricebuttonVectorAppend(ButVector, r);
 	return r;
 }
@@ -302,7 +302,8 @@ void getJoystickForDriveTrain() {
 	int y1 = joystickGetAnalog(1, 3);
 	int x2 = joystickGetAnalog(1, 1);
 	int y2 = joystickGetAnalog(1, 2);
-	int left, right, norm;
+	int left, right;
+	float norm;
 
 	//	printf("Joysticks Gotten\n\r");
 
@@ -379,7 +380,6 @@ void getJoystickForDriveTrain() {
 void updatePid(Ricepid *pidLoop) {
 	if (pidLoop->running) {
 		pidLoop->current = *(pidLoop->sensor);
-//		printf("Sensor: %p, Senseval: %d, Current: %d\n\r", pidLoop->sensor, *pidLoop->sensor, pidLoop->current);
 		pidLoop->error = pidLoop->setPoint - pidLoop->current;
 		pidLoop->integral += pidLoop->error;
 		pidLoop->derivative = pidLoop->lastError - pidLoop->error;
@@ -406,7 +406,7 @@ void updateRicencoder(Ricencoder *rc) {
 	else {
 		rc->rawValue = encoderGet(rc->enc);
 	}
-	rc->adjustedValue = rc->rawValue * rc->mult * (rc->reverse ? 1 : -1);
+	rc->adjustedValue = rc->rawValue * rc->mult * (rc->reverse ? -1 : 1);
 }
 
 /*
@@ -435,6 +435,12 @@ void updateRicebutton(Ricebutton *rb) {
 	}
 }
 
+void resetRicencoder() {
+	for(int i = 1; i < EncVector->elem_current; i++) {
+		imeReset(ricencoderVectorGet(EncVector, i)->imeAddress);
+		updateRicencoder(ricencoderVectorGet(EncVector, i));
+	}
+}
 /*
  * Runs an instruction, to be used during autonomous mode
  *
@@ -654,10 +660,10 @@ int speedRegulator(int speed) {
 	}
 }
 
-int normalize(int left, int right) {
-	int norm = 1;
+float normalize(int left, int right) {
+	float norm = 1;
 	if(max(left, right) > 127) {
-		norm = 127 / max(left, right);
+		norm = 127.0 / max(left, right);
 	}
 	return norm;
 }
@@ -720,23 +726,19 @@ int max4(int a, int b, int c, int d) {
 void IOTask(void *ignore) {
 	while(1) {
 		//Update DT Motors
-//		printf("\n\rMOT: ");
 		for(int i = 1; i < MOTVector->elem_current; i++) {
-//			printf("%d ", i);
 			motorSet(ricemotorVectorGet(MOTVector, i)->port, ricemotorVectorGet(MOTVector, i)->out * ricemotorVectorGet(MOTVector, i)->reflected);
 		}
-//		printf("\n\rEnc: ");
 		for(int i = 1; i < EncVector->elem_current; i++) {
-//			printf("%d ", i);
 			updateRicencoder(ricencoderVectorGet(EncVector, i));
 		}
-//		printf("\n\rPot: ");
 		for(int i = 1; i < PotVector->elem_current; i++) {
-//			printf("%d ", i);
 			updateRicepot(ricepotVectorGet(PotVector, i));
 		}
-//		printf("\n\r");
-
+		for(int i = 1; i < ButVector->elem_current; i++) {
+			updateRicebutton(ricebuttonVectorGet(ButVector, i));
+		}
+		
 		updateRicegyro(gyro);
 		delay(10);
 	}
@@ -744,37 +746,9 @@ void IOTask(void *ignore) {
 
 void PidTask(void *ignore) {
 	while(1) {
-//		printf("Pid: ");
 		for(int i = 1; i < PidVector->elem_current; i++) {
-//			printf("%d", i);
 			updatePid(ricepidVectorGet(PidVector, i));
 		}
-//		printf("\n\r");
-		//Manually add each pid loop here
-//		processPid(&PidARMLeft, EncARMLeft.adjustedValue);
-//		processPid(&PidARMRight, EncARMRight.adjustedValue);
-//		processPid(&PidARMFront, PotARMFront.value);
-//		if(PidARMLeft.running) {
-//			MOTARMBottomLeft->out = PidARMLeft.output;
-//		}
-//		if(PidARMRight.running) {
-//			MOTARMBottomRight->out = PidARMRight.output;
-//		}
-//		if(PidARMFront.running) {
-//			MOTARMFront->out = PidARMFront.output;
-//		}
-
-		printf("Encoder: %d, Pid Sensor: %d\n\r", EncDTLeft->adjustedValue, PidDTLeft->current);
-//		printf("DriveTrain: %d|%d\n\r", MOTDTFrontLeft.out, MOTDTFrontRight.out);
-//		printf("Setpoint: %d|%d, Raw: %d|%d, Adj: %d|%d, Out: %d|%d, Pid: %d|%d\n\r",
-//				PidARMLeft.setPoint, PidARMRight.setPoint,
-//				EncARMLeft.rawValue, EncARMRight.rawValue,
-//				EncARMLeft.adjustedValue, EncARMRight.adjustedValue,
-//				MOTARMBottomLeft.out, MOTARMBottomRight.out,
-//				PidARMLeft.running, PidARMRight.running);
-//		printf("Setpoint: %d, Current: %d, Out: %d\n\r", PidARMFront.setPoint, PotARMFront.value, MOTARMFront.out);
-//		printf("Gyro: %d\n\r", gyro.value);
-//		printf("Power: %dmV\n\r", powerLevelMain());
 		delay(20);
 	}
 }

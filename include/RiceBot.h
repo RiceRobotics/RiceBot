@@ -356,8 +356,11 @@ ricesolenoidVector* SolVector;
 //Default Ricebutton
 Ricebutton* ButDefault;
 
-Ricebutton* ButLeft;
-Ricebutton* ButRight;
+Ricebutton* ButConLeft;
+Ricebutton* ButConRight;
+Ricebutton* ButARMBase;
+Ricebutton* ButARMFrontLeft;
+Ricebutton* ButARMFrontRight;
 
 ricebuttonVector* ButVector;
 
@@ -382,7 +385,7 @@ Ricegyro* initRicegyro(unsigned char port, unsigned short multiplier);
 
 Ricesolenoid* initRicesolenoid(unsigned char port, int state, int reversed);
 
-Ricebutton* initRicebutton(unsigned char port, int state);
+Ricebutton* initRicebutton(unsigned char port);
 
 //Prototyping of all Vector-related functions
 
@@ -442,11 +445,12 @@ void updateRicesolenoid(Ricesolenoid *rs);
 
 void updateRicebutton(Ricebutton *rb);
 
+void resetRicencoder();
 void autonomousTask(int instruction, int distance, int pow, long timeout);
 
 int speedRegulator(int speed);
 
-int normalize(int left, int right);
+float normalize(int left, int right);
 
 void DTStopMotors();
 
@@ -454,6 +458,7 @@ void IOTask(void *ignore);
 
 void PidTask(void *ignore);
 
+void miscTask(void *ignore);
 int max(int a, int b);
 
 int min(int a, int b);
@@ -461,5 +466,3 @@ int min(int a, int b);
 int max4(int a, int b, int c, int d);
 
 #endif /* RICEBOT_H_ */
-
-//It works!
