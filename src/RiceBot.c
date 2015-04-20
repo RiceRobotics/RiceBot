@@ -1089,3 +1089,80 @@ Ricebutton* ricebuttonVectorGet(ricebuttonVector* vect, int index) {
 	}
 	return return_elem;
 }
+
+// A typical init function
+/*
+void initialize() {
+	riceBotInitialize();
+
+	driveTrainStyle = DTFOURWHEELS;
+	controlStyle = CTCHEEZYDRIVE;
+
+	MOTDTFrontLeft = initRicemotor(9, 1);
+	MOTDTFrontRight = initRicemotor(8, -1);
+	MOTDTBackLeft = initRicemotor(3, 1);
+	MOTDTBackRight = initRicemotor(2, -1);
+
+	MOTARMLeft = initRicemotor(6, -1);
+	MOTARMRight = initRicemotor(5, -1);
+
+	MOTARMFront = initRicemotor(7, 1);
+	MOTConveyor = initRicemotor(4, 1);
+	MOTCLAW = initRicemotor(10, -1);
+	MOTCOL = initRicemotor(9, 1);
+
+	EncDTLeft = initRicencoderIME(627.2, 1, 0, false);
+	EncDTRight = initRicencoderIME(627.2, 1, 1, true);
+
+	EncARMLeft = initRicencoderIME(627.2, 1, 3, true);
+	EncARMRight = initRicencoderIME(627.2, 1, 2, false);
+	EncARMFront = initRicencoderIME(627.2, 1, 4, false);
+
+//	ButConLeft = initRicebutton(2);
+//	ButConRight = initRicebutton(1);
+	ButARMBase = initRicebutton(4);
+//	ButARMFrontLeft = initRicebutton(5);
+//	ButARMFrontRight = initRicebutton(6);
+
+	gyro = initRicegyro(1, 196);
+
+	Ricemotor* armLeft[2] = {MOTARMLeft, MOTDefault};
+	Ricemotor* armRight[2] = {MOTARMRight, MOTDefault};
+	PidARMLeft = initRicepid(&(EncARMLeft->adjustedValue), .2, 0, 0, armLeft);
+	PidARMRight = initRicepid(&(EncARMRight->adjustedValue), .2, 0, 0, armRight);
+	PidARMLeft->running = 1;
+	PidARMRight->running = 1;
+
+	delay(500);
+
+	taskCreate(IOTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_HIGHEST);
+	taskCreate(PidTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
+	taskCreate(miscTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
+}*/
+
+// A typical miscTask
+/*
+void miscTask(void *ignore) {
+	while(1) {
+
+//		printf("EncARMFront: %d\n\r", EncARMFront->adjustedValue);
+		printf("Buttons: %d|%d|%d|%d|%d\n\r", ButConLeft->state, ButConRight->state, ButARMBase->state,
+				ButARMFrontLeft->state, ButARMFrontRight->state);
+
+//		printf("DriveTrain: %d|%d | %d|%d\n\r", MOTDTFrontLeft->out, MOTDTFrontRight->out,
+//				MOTDTBackLeft->out, MOTDTBackRight->out);
+//
+//		printf("Setpoint: %d|%d, Raw: %d|%d, Adj: %d|%d, Out: %d|%d, Pid: %d|%d\n\r",
+//				PidARMLeft->setPoint, PidARMRight->setPoint,
+//				EncARMLeft->rawValue, EncARMRight->rawValue,
+//				EncARMLeft->adjustedValue, EncARMRight->adjustedValue,
+//				MOTARMLeft->out, MOTARMRight->out,
+//				PidARMLeft->running, PidARMRight->running);
+//
+//		printf("Gyro: %d\n\r", gyro->value);
+//
+//		printf("Power: %dmV\n\r", powerLevelMain());
+		delay(20);
+	}
+}
+ */
