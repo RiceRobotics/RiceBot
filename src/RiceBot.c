@@ -677,6 +677,7 @@ void DTStopMotors() {
 	MOTDTFrontMidLeft->out = 0;
 	MOTDTMidLeft->out = 0;
 	MOTDTBackLeft->out = 0;
+	MOTDTHDrive->out = 0;
 }
 
 /*

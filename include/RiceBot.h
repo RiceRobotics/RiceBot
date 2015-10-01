@@ -240,6 +240,7 @@ int controlStyle;
 #define DTMECANUM 		3
 #define DTHOLONOMIC 	4
 #define DTSWERVE 		6
+#define DTHDRIVE 7
 
 //Defines the drivetrain installed on the robot (DT-)
 int driveTrainStyle;
@@ -270,6 +271,7 @@ Ricemotor* MOTDTFrontMidLeft;
 Ricemotor* MOTDTMidLeft;
 Ricemotor* MOTDTBackLeft;
 Ricemotor* MOTDTBack;
+Ricemotor* MOTDTHDrive;
 
 //Declaration of all possible Arm motors
 //This is just to make the code more understandable when comparing an arm motor
