@@ -54,6 +54,7 @@
 void operatorControl() {
 
 	while (1) {
+		getJoystickForDriveTrain();
 		delay(20);
 	}
 }

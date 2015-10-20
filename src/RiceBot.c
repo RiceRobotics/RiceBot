@@ -44,63 +44,64 @@ void riceBotInitialize() {
 	MOTDTMidLeft = MOTDefault;
 	MOTDTBackLeft = MOTDefault;
 	MOTDTBack = MOTDefault;
+	MOTDTHDrive = MOTDefault;
 
-	MOTARMFront = MOTDefault;
-	MOTARMBack = MOTDefault;
-	MOTARMTop = MOTDefault;
-	MOTARMMiddle = MOTDefault;
-	MOTARMBottom = MOTDefault;
-	MOTARMLeft = MOTDefault;
-	MOTARMRight = MOTDefault;
-	MOTARMTopRight = MOTDefault;
-	MOTARMBottomRight = MOTDefault;
-	MOTARMTopLeft = MOTDefault;
-	MOTARMBottomLeft = MOTDefault;
-	MOTARMOuterLeft = MOTDefault;
-	MOTARMOuterRight = MOTDefault;
-	MOTARMInnerLeft = MOTDefault;
-	MOTARMInnerRight = MOTDefault;
+//	MOTARMFront = MOTDefault;
+//	MOTARMBack = MOTDefault;
+//	MOTARMTop = MOTDefault;
+//	MOTARMMiddle = MOTDefault;
+//	MOTARMBottom = MOTDefault;
+//	MOTARMLeft = MOTDefault;
+//	MOTARMRight = MOTDefault;
+//	MOTARMTopRight = MOTDefault;
+//	MOTARMBottomRight = MOTDefault;
+//	MOTARMTopLeft = MOTDefault;
+//	MOTARMBottomLeft = MOTDefault;
+//	MOTARMOuterLeft = MOTDefault;
+//	MOTARMOuterRight = MOTDefault;
+//	MOTARMInnerLeft = MOTDefault;
+//	MOTARMInnerRight = MOTDefault;
 
-	MOTCOL = MOTDefault;
-	MOTCOLLeft = MOTDefault;
-	MOTCOLRight = MOTDefault;
-	MOTCLAW = MOTDefault;
-	MOTConveyor = MOTDefault;
+//	MOTCOL = MOTDefault;
+//	MOTCOLLeft = MOTDefault;
+//	MOTCOLRight = MOTDefault;
+//	MOTCLAW = MOTDefault;
+//	MOTConveyor = MOTDefault;
 
 	Ricemotor* array[2] = {MOTDefault, MOTDefault};
 	PidDefault = initRicepid(0, 0, 0, 0, array);
-	PidDTLeft = PidDefault;
-	PidDTRight = PidDefault;
-	PidARMLeft = PidDefault;
-	PidARMRight = PidDefault;
-	PidARMBottom = PidDefault;
-	PidARMTop = PidDefault;
-	PidARMFront = PidDefault;
-	PidARMTop = PidDefault;
-	PidARMBottom = PidDefault;
+//	PidDTLeft = PidDefault;
+//	PidDTRight = PidDefault;
+//	PidARMLeft = PidDefault;
+//	PidARMRight = PidDefault;
+//	PidARMBottom = PidDefault;
+//	PidARMTop = PidDefault;
+//	PidARMFront = PidDefault;
+//	PidARMTop = PidDefault;
+//	PidARMBottom = PidDefault;
 
 	EncDefault = initRicencoder(0, 0, 0, 0, 0, 0, false);
-	EncDTLeft = EncDefault;
-	EncDTRight = EncDefault;
-	EncARMLeft = EncDefault;
-	EncARMRight = EncDefault;
-	EncARMBottom = EncDefault;
-	EncARMTop = EncDefault;
-	EncARMFront = EncDefault;
+//	EncDTLeft = EncDefault;
+//	EncDTRight = EncDefault;
+//	EncARMLeft = EncDefault;
+//	EncARMRight = EncDefault;
+//	EncARMBottom = EncDefault;
+//	EncARMTop = EncDefault;
+//	EncARMFront = EncDefault;
 
 	PotDefault = initRicepot(0, 0);
-	PotARMFront = PotDefault;
-	PotARMLeft = PotDefault;
-	PotARMRight = PotDefault;
+//	PotARMFront = PotDefault;
+//	PotARMLeft = PotDefault;
+//	PotARMRight = PotDefault;
 
 	ButDefault = initRicebutton(0);
-	ButConLeft = ButDefault;
-	ButConRight = ButDefault;
-	ButARMBase = ButDefault;
-	ButARMFrontLeft = ButDefault;
-	ButARMFrontRight = ButDefault;
+//	ButConLeft = ButDefault;
+//	ButConRight = ButDefault;
+//	ButARMBase = ButDefault;
+//	ButARMFrontLeft = ButDefault;
+//	ButARMFrontRight = ButDefault;
 	
-	imeInitializeAll();
+//	imeInitializeAll();
 	printf("Initialization complete\n\r");
 }
 
@@ -468,7 +469,7 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 	power[1] = (pow == NULL) ? 127 : pow;
 	power[0] = power[1];
 
-	int currentEnc[2] = {EncDTLeft->adjustedValue, EncDTRight->adjustedValue};
+//	int currentEnc[2] = {EncDTLeft->adjustedValue, EncDTRight->adjustedValue};
 
 	switch(instruction) {
 	case AUTODRIVETIME:
@@ -484,16 +485,16 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		}
 		break;
 	case AUTODRIVEBASIC:
-		target = EncDTLeft->ticksPerRev / (4 * MATH_PI) * distance;
-
-		while(currentEnc[1] < target && millis() < startTime + timeout) {
-			if(abs(currentEnc[1] - currentEnc[0]) > 50) {
-				if(currentEnc[0] > currentEnc[1]) {
-					power[0] = speedRegulator(power[0] - 2);
-				} else if(currentEnc[0] < currentEnc[1]) {
-					power[0] = speedRegulator(power[0] + 2);
-				}
-			}
+//		target = EncDTLeft->ticksPerRev / (4 * MATH_PI) * distance;
+//
+//		while(currentEnc[1] < target && millis() < startTime + timeout) {
+//			if(abs(currentEnc[1] - currentEnc[0]) > 50) {
+//				if(currentEnc[0] > currentEnc[1]) {
+//					power[0] = speedRegulator(power[0] - 2);
+//				} else if(currentEnc[0] < currentEnc[1]) {
+//					power[0] = speedRegulator(power[0] + 2);
+//				}
+//			}
 
 			MOTDTFrontRight->out = power[1];
 			MOTDTFrontMidRight->out = power[1];
@@ -505,8 +506,8 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 			MOTDTBackLeft->out = power[0];
 
 			delay(20);
-			currentEnc[0] = EncDTLeft->adjustedValue;
-			currentEnc[1] = EncDTRight->adjustedValue;
+//			currentEnc[0] = EncDTLeft->adjustedValue;
+//			currentEnc[1] = EncDTRight->adjustedValue;
 		}
 		break;
 	case AUTOTURNBASIC:
@@ -537,79 +538,79 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		}
 		break;
 	case AUTODRIVEGYRO:
-		target = EncDTLeft->ticksPerRev / (4 * MATH_PI) * distance;
+//		target = EncDTLeft->ticksPerRev / (4 * MATH_PI) * distance;
 		int targetGyro = gyro->value;
 
-		while(currentEnc[0] < target && millis() < startTime + timeout) {
-			if(abs(gyro->value - targetGyro) > 10) {				//If gyro is outside of tolerance from start orientation
-				if(gyro->value > targetGyro) {					//Too far CCW
-					power[0] = speedRegulator(power[0] + 2);
-					power[1] = speedRegulator(power[1] - 2);
-				} else if(gyro->value < targetGyro) {			//Too far CW
-					power[0] = speedRegulator(power[0] - 2);
-					power[1] = speedRegulator(power[1] + 2);
-				}
-			}
-
-			MOTDTFrontRight->out = power[1];
-			MOTDTFrontMidRight->out = power[1];
-			MOTDTMidRight->out = power[1];
-			MOTDTBackRight->out = power[1];
-			MOTDTFrontLeft->out = power[0];
-			MOTDTFrontMidLeft->out = power[0];
-			MOTDTMidLeft->out = power[0];
-			MOTDTBackLeft->out = power[0];
-
-			delay(20);
-			currentEnc[0] = EncDTLeft->adjustedValue;
-			currentEnc[1] = EncDTRight->adjustedValue;
-		}
+//		while(currentEnc[0] < target && millis() < startTime + timeout) {
+//			if(abs(gyro->value - targetGyro) > 10) {				//If gyro is outside of tolerance from start orientation
+//				if(gyro->value > targetGyro) {					//Too far CCW
+//					power[0] = speedRegulator(power[0] + 2);
+//					power[1] = speedRegulator(power[1] - 2);
+//				} else if(gyro->value < targetGyro) {			//Too far CW
+//					power[0] = speedRegulator(power[0] - 2);
+//					power[1] = speedRegulator(power[1] + 2);
+//				}
+//			}
+//
+//			MOTDTFrontRight->out = power[1];
+//			MOTDTFrontMidRight->out = power[1];
+//			MOTDTMidRight->out = power[1];
+//			MOTDTBackRight->out = power[1];
+//			MOTDTFrontLeft->out = power[0];
+//			MOTDTFrontMidLeft->out = power[0];
+//			MOTDTMidLeft->out = power[0];
+//			MOTDTBackLeft->out = power[0];
+//
+//			delay(20);
+////			currentEnc[0] = EncDTLeft->adjustedValue;
+////			currentEnc[1] = EncDTRight->adjustedValue;
+//		}
 		break;
 	case AUTOCOLLECTORS:
 		if(timeout == NULL) {
-			MOTCOL->out = pow;
-			MOTCOLLeft->out = pow;
-			MOTCOLRight->out = pow;
+//			MOTCOL->out = pow;
+//			MOTCOLLeft->out = pow;
+//			MOTCOLRight->out = pow;
 		}
 		else {
 			while (millis() < startTime + timeout) {
-				MOTCOL->out = pow;
-				MOTCOLLeft->out = pow;
-				MOTCOLRight->out = pow;
+//				MOTCOL->out = pow;
+//				MOTCOLLeft->out = pow;
+//				MOTCOLRight->out = pow;
 			}
-			MOTCOL->out = 0;
-			MOTCOLLeft->out = 0;
-			MOTCOLRight->out = 0;
+//			MOTCOL->out = 0;
+//			MOTCOLLeft->out = 0;
+//			MOTCOLRight->out = 0;
 		}
 		break;
 	case AUTOARMTIME:
-		PidARMLeft->running = 0;
-		PidARMRight->running = 0;
-		if(timeout == NULL) {
-			MOTARMBottomLeft->out = pow;
-			MOTARMBottomRight->out = pow;
-		}
-		else {
-			while (millis() < startTime + timeout) {
-				MOTARMBottomLeft->out = pow;
-				MOTARMBottomRight->out = pow;
-			}
-			PidARMLeft->running = 1;
-			PidARMRight->running = 1;
-			PidARMLeft->setPoint = EncARMLeft->adjustedValue + 60;
-			PidARMRight->setPoint = EncARMRight->adjustedValue + 60;
-		}
+//		PidARMLeft->running = 0;
+//		PidARMRight->running = 0;
+//		if(timeout == NULL) {
+//			MOTARMBottomLeft->out = pow;
+//			MOTARMBottomRight->out = pow;
+//		}
+//		else {
+//			while (millis() < startTime + timeout) {
+//				MOTARMBottomLeft->out = pow;
+//				MOTARMBottomRight->out = pow;
+//			}
+//			PidARMLeft->running = 1;
+//			PidARMRight->running = 1;
+//			PidARMLeft->setPoint = EncARMLeft->adjustedValue + 60;
+//			PidARMRight->setPoint = EncARMRight->adjustedValue + 60;
+//		}
 		break;
 	case AUTOCLAW:
-		if(timeout == NULL) {
-			MOTCLAW->out = pow;
-		}
-		else {
-			while (millis() < startTime + timeout) {
-				MOTCLAW->out = pow;
-			}
-			MOTCLAW->out = 0;
-		}
+//		if(timeout == NULL) {
+//			MOTCLAW->out = pow;
+//		}
+//		else {
+//			while (millis() < startTime + timeout) {
+//				MOTCLAW->out = pow;
+//			}
+//			MOTCLAW->out = 0;
+//		}
 		break;
 	case AUTOTURNTIME:
 		target = distance;

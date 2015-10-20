@@ -59,15 +59,17 @@ void initializeIO() {
  * can be implemented in this task if desired.
  */
 void initialize() {
-//	driveTrainStyle = DTFOURWHEELS;
-//	controlStyle = CTCHEEZYDRIVE;
-//
-//	riceBotInitialize();
+	driveTrainStyle = DTFOURWHEELS;
+	controlStyle = CTCHEEZYDRIVE;
 
-//	MOTDTFrontLeft = initRicemotor(2, -1, 'D');
-//	MOTDTFrontRight = initRicemotor(7, -1, 'D');
-//	MOTDTBackLeft = initRicemotor(3, 1, 'D');
-//	MOTDTBackRight = initRicemotor(9, 1,'D');
+	riceBotInitialize();
+
+//	imeInitializeAll();
+
+	MOTDTFrontLeft = initRicemotor(2, -1);
+	MOTDTFrontRight = initRicemotor(3, 1);
+	MOTDTBackLeft = initRicemotor(8, -1);
+	MOTDTBackRight = initRicemotor(9, 1);
 
 	//	MOTARMFront = initMotor(4, 1);
 	//	MOTARMBottomLeft = initMotor(5, 1);
@@ -89,26 +91,29 @@ void initialize() {
 
 	taskCreate(IOTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_HIGHEST);
 	taskCreate(PidTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
-
+//	taskCreate(miscTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
 }
 
-//void startPidTask(void *ignore) {
-//	while(1) {
-//		//Manually add each pid loop here
-//		processPid(&PidARMLeft, PotARMLeft.value);
-//		processPid(&PidARMRight, PotARMRight.value);
-//		processPid(&PidARMFront, PotARMFront.value);
-//		if(PidARMLeft.running) {
-//			MOTARMBottomLeft.out = PidARMLeft.output;
-//		}
-//		if(PidARMRight.running) {
-//			MOTARMBottomRight.out = PidARMRight.output;
-//		}
-//		if(PidARMFront.running) {
-//			MOTARMTopLeft.out = PidARMFront.output;
-//			MOTARMBottomLeft.out = PidARMFront.output;
-//		}
-//
-//		delay(20);
-//	}
-//}
+void miscTask(void *ignore) {
+	while(1) {
+
+// Drivetrain Debug
+//		printf("DriveTrain: %d|%d | %d|%d\n\r", MOTDTFrontLeft->out, MOTDTFrontRight->out,
+//				MOTDTBackLeft->out, MOTDTBackRight->out);
+
+// Pid Debug
+//		printf("Setpoint: %d|%d, Raw: %d|%d, Adj: %d|%d, Out: %d|%d, Pid: %d|%d\n\r",
+//				PidARMLeft->setPoint, PidARMRight->setPoint,
+//				EncARMLeft->rawValue, EncARMRight->rawValue,
+//				EncARMLeft->adjustedValue, EncARMRight->adjustedValue,
+//				MOTARMLeft->out, MOTARMRight->out,
+//				PidARMLeft->running, PidARMRight->running);
+
+// Gyro Debug
+//		printf("Gyro: %d\n\r", gyro->value);
+
+// Battery Level
+//		printf("Power: %dmV\n\r", powerLevelMain());
+		delay(20);
+	}
+}

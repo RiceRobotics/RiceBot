@@ -276,73 +276,65 @@ Ricemotor* MOTDTHDrive;
 //Declaration of all possible Arm motors
 //This is just to make the code more understandable when comparing an arm motor
 //name to the physical motor on the robot
-Ricemotor* MOTARMFront;
-Ricemotor* MOTARMBack;
-Ricemotor* MOTARMTop;
-Ricemotor* MOTARMMiddle;
-Ricemotor* MOTARMBottom;
-Ricemotor* MOTARMLeft;
-Ricemotor* MOTARMRight;
-Ricemotor* MOTARMTopRight;
-Ricemotor* MOTARMBottomRight;
-Ricemotor* MOTARMTopLeft;
-Ricemotor* MOTARMBottomLeft;
-Ricemotor* MOTARMOuterLeft;
-Ricemotor* MOTARMOuterRight;
-Ricemotor* MOTARMInnerLeft;
-Ricemotor* MOTARMInnerRight;
+//Ricemotor* MOTARMFront;
+//Ricemotor* MOTARMBack;
+//Ricemotor* MOTARMTop;
+//Ricemotor* MOTARMMiddle;
+//Ricemotor* MOTARMBottom;
+//Ricemotor* MOTARMLeft;
+//Ricemotor* MOTARMRight;
+//Ricemotor* MOTARMTopRight;
+//Ricemotor* MOTARMBottomRight;
+//Ricemotor* MOTARMTopLeft;
+//Ricemotor* MOTARMBottomLeft;
+//Ricemotor* MOTARMOuterLeft;
+//Ricemotor* MOTARMOuterRight;
+//Ricemotor* MOTARMInnerLeft;
+//Ricemotor* MOTARMInnerRight;
 
 //Declaration of all possible Collector motors
-Ricemotor* MOTCOL;
-Ricemotor* MOTCOLLeft;
-Ricemotor* MOTCOLRight;
-Ricemotor* MOTCLAW;
-Ricemotor* MOTConveyor;
+//Ricemotor* MOTCOL;
+//Ricemotor* MOTCOLLeft;
+//Ricemotor* MOTCOLRight;
+//Ricemotor* MOTCLAW;
+//Ricemotor* MOTConveyor;
 
 ricemotorVector* MOTVector;
-//motorVector* DTMotorVector;
-//motorVector* ARMMotorVector;
-//motorVector* COLMotorVector;
 
 //Default Ricepid
 Ricepid* PidDefault;
 
-Ricepid* PidDTLeft;
-Ricepid* PidDTRight;
-Ricepid* PidARMLeft;
-Ricepid* PidARMRight;
-Ricepid* PidARMBottom;
-Ricepid* PidARMTop;
-Ricepid* PidARMFront;
-Ricepid* PidARMTop;
-Ricepid* PidARMBottom;
+//Ricepid* PidDTLeft;
+//Ricepid* PidDTRight;
+//Ricepid* PidARMLeft;
+//Ricepid* PidARMRight;
+//Ricepid* PidARMBottom;
+//Ricepid* PidARMTop;
+//Ricepid* PidARMFront;
+//Ricepid* PidARMTop;
+//Ricepid* PidARMBottom;
 
 ricepidVector* PidVector;
-
-//unsigned char IMEDTLEFT;
-//unsigned char IMEDTRIGHT;
-//unsigned char IMEARMLEFT;
-//unsigned char IMEARMRIGHT;
 
 //Default Ricencoder
 Ricencoder* EncDefault;
 
-Ricencoder* EncDTLeft;
-Ricencoder* EncDTRight;
-Ricencoder* EncARMLeft;
-Ricencoder* EncARMRight;
-Ricencoder* EncARMBottom;
-Ricencoder* EncARMTop;
-Ricencoder* EncARMFront;
+//Ricencoder* EncDTLeft;
+//Ricencoder* EncDTRight;
+//Ricencoder* EncARMLeft;
+//Ricencoder* EncARMRight;
+//Ricencoder* EncARMBottom;
+//Ricencoder* EncARMTop;
+//Ricencoder* EncARMFront;
 
 ricencoderVector* EncVector;
 
 //Default Ricepot
 Ricepot* PotDefault;
 
-Ricepot* PotARMFront;
-Ricepot* PotARMLeft;
-Ricepot* PotARMRight;
+//Ricepot* PotARMFront;
+//Ricepot* PotARMLeft;
+//Ricepot* PotARMRight;
 
 ricepotVector* PotVector;
 
@@ -351,18 +343,18 @@ Ricegyro* gyro;
 //Default Ricesolenoid
 Ricesolenoid* SolDefault;
 
-Ricesolenoid* SolClaw;
+//Ricesolenoid* SolClaw;
 
 ricesolenoidVector* SolVector;
 
 //Default Ricebutton
 Ricebutton* ButDefault;
 
-Ricebutton* ButConLeft;
-Ricebutton* ButConRight;
-Ricebutton* ButARMBase;
-Ricebutton* ButARMFrontLeft;
-Ricebutton* ButARMFrontRight;
+//Ricebutton* ButConLeft;
+//Ricebutton* ButConRight;
+//Ricebutton* ButARMBase;
+//Ricebutton* ButARMFrontLeft;
+//Ricebutton* ButARMFrontRight;
 
 ricebuttonVector* ButVector;
 
