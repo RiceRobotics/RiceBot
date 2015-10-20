@@ -11,6 +11,7 @@
  */
 
 #include "RiceBot.h"
+//#include <API.h>
 
 void riceBotInitializeIO() {
 //  SolVector = initRicesolenoidVector();
