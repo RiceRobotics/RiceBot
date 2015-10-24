@@ -11,7 +11,7 @@
  */
 
 #include "RiceBot.h"
-//#include <API.h>
+#include <API.h>
 
 void riceBotInitializeIO() {
 //  SolVector = initRicesolenoidVector();
@@ -19,7 +19,7 @@ void riceBotInitializeIO() {
 //  SolClaw = SolDefault;
 }
 
-/*
+/**
  * Call this from the default Initialize function.
  * After, be sure to reinitialize each motor you will be using on your robot.
  */
@@ -105,7 +105,7 @@ void riceBotInitialize() {
 	printf("Initialization complete\n\r");
 }
 
-/*
+/**
  * Initializes a Motor type
  *
  * @param port The port on the Cortex which the motor is plugged into
@@ -123,7 +123,7 @@ Ricemotor* initRicemotor(unsigned char port, int reflected) {
 	return m;
 }
 
-/*
+/**
  * Initializes a Pid type
  *
  * @param *sensor A pointer to the sensor's value field
@@ -155,7 +155,7 @@ Ricepid* initRicepid(int* sensor, float kP, float kI, float kD, Ricemotor* motor
 	return p;
 }
 
-/*
+/**
  * The Ricencoder contains data for either an IME or a quadrature encoder
  *
  * @param ticksPerRev The number of ticks per revolution of the encoder
@@ -223,7 +223,7 @@ Ricencoder* initRicencoderQUAD(float ticksPerRev, int mult, unsigned char portTo
 	return r;
 }
 
-/*
+/**
  * Initializes a Ricepot
  *
  * @param port The port on the Cortex which the potentiometer is plugged into
@@ -241,7 +241,7 @@ Ricepot* initRicepot(unsigned char port, int reversed) {
 	return r;
 }
 
-/*
+/**
  * Initializes a Ricegyro
  *
  * @param port The port on the Cortex which the gyro is plugged into
@@ -260,7 +260,7 @@ Ricegyro* initRicegyro(unsigned char port, unsigned short multiplier) {
 	return gyro;
 }
 
-/*
+/**
  * Initializes a Ricesolenoid
  *
  * @param port The digital port on the Cortex which the solenoid is plugged into
@@ -279,7 +279,7 @@ Ricesolenoid* initRicesolenoid(unsigned char port, int state, int reversed) {
 	return sol;
 }
 
-/*
+/**
  * Initializes a Ricebutton
  *
  * @param port The port on the Cortex which the button or limit switch is plugged into
@@ -295,7 +295,7 @@ Ricebutton* initRicebutton(unsigned char port) {
 	return r;
 }
 
-/*
+/**
  * Checks joystick input and sets all Motor structs to appropriate output
  */
 void getJoystickForDriveTrain() {
@@ -372,7 +372,7 @@ void getJoystickForDriveTrain() {
 	}
 }
 
-/*
+/**
  * Updates a PID loop based on the value of a sensor
  *
  * @param *pidLoop A pointer to the pid struct to update
@@ -396,7 +396,7 @@ void updatePid(Ricepid *pidLoop) {
 	}
 }
 
-/*
+/**
  * Updates the value of any Ricencoder based on a pointer to the struct
  *
  * @param *rc A pointer to the Ricencoder struct
@@ -411,7 +411,7 @@ void updateRicencoder(Ricencoder *rc) {
 	rc->adjustedValue = rc->rawValue * rc->mult * (rc->reverse ? -1 : 1);
 }
 
-/*
+/**
  * Updates the value of any Ricepot based on a pointer to the struct
  *
  * @param *rg A pointer to the Ricepot struct
@@ -420,7 +420,7 @@ void updateRicepot(Ricepot *rp) {
 	rp->value = analogReadCalibrated(rp->port) * rp->reversed;
 }
 
-/*
+/**
  * Updates the value of any Ricegyro based on a pointer to the struct
  *
  * @param *rg A pointer to the Ricegyro struct
@@ -443,7 +443,7 @@ void resetRicencoder() {
 		updateRicencoder(ricencoderVectorGet(EncVector, i));
 	}
 }
-/*
+/**
  * Runs an instruction, to be used during autonomous mode
  *
  * @param instruction The autonomous instruction to execute. Options are:
@@ -505,10 +505,10 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 			MOTDTMidLeft->out = power[0];
 			MOTDTBackLeft->out = power[0];
 
-			delay(20);
+//			delay(20);
 //			currentEnc[0] = EncDTLeft->adjustedValue;
 //			currentEnc[1] = EncDTRight->adjustedValue;
-		}
+//		}
 		break;
 	case AUTOTURNBASIC:
 		target = gyro->value + distance;
@@ -539,7 +539,7 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 		break;
 	case AUTODRIVEGYRO:
 //		target = EncDTLeft->ticksPerRev / (4 * MATH_PI) * distance;
-		int targetGyro = gyro->value;
+//		int targetGyro = gyro->value;
 
 //		while(currentEnc[0] < target && millis() < startTime + timeout) {
 //			if(abs(gyro->value - targetGyro) > 10) {				//If gyro is outside of tolerance from start orientation
@@ -645,7 +645,7 @@ void autonomousTask(int instruction, int distance, int pow, long timeout) {
 	DTStopMotors();
 }
 
-/*
+/**
  * Ensures a value is inside the acceptable bounds for a motor output
  *
  * @param speed The desired speed to set to a motor
@@ -682,7 +682,7 @@ void DTStopMotors() {
 	MOTDTHDrive->out = 0;
 }
 
-/*
+/**
  * Determines which of two numbers is larger
  *
  * @param a The first number
@@ -697,7 +697,7 @@ int max(int a, int b) {
 	return a;
 }
 
-/*
+/**
  * Determines which of two numbers is smaller
  *
  * @param a The first number
@@ -712,7 +712,7 @@ int min(int a, int b) {
 	return a;
 }
 
-/*
+/**
  * Determines which of 4 numbers is the largest
  *
  * @param a The first number
@@ -756,7 +756,7 @@ void PidTask(void *ignore) {
 	}
 }
 
-/*
+/**
  * Initializes a vector
  */
 ricemotorVector* initRicemotorVector() {
@@ -767,10 +767,7 @@ ricemotorVector* initRicemotorVector() {
 	return vect;
 }
 
-/*
- * Initializes a vector
- */
-/*
+/**
  * Adds an element to the vector
  *
  * @param vect A pointer to the destination vector
@@ -799,7 +796,7 @@ int ricemotorVectorAppend(ricemotorVector* vect, Ricemotor* element) {
 	return 1;
 }
 
-/*
+/**
  * Returns the element at a given index
  *
  * @param vect A pointer to the destination vector
@@ -818,7 +815,7 @@ Ricemotor* ricemotorVectorGet(ricemotorVector* vect, int index) {
 	return return_elem;
 }
 
-/*
+/**
  * Initializes a vector
  */
 ricepidVector* initRicepidVector() {
@@ -829,7 +826,7 @@ ricepidVector* initRicepidVector() {
 	return vect;
 }
 
-/*
+/**
  * Adds an element to the vector
  *
  * @param vect A pointer to the destination vector
@@ -854,7 +851,7 @@ int ricepidVectorAppend(ricepidVector* vect, Ricepid* element) {
 	return 1;
 }
 
-/*
+/**
  * Returns the element at a given index
  *
  * @param vect A pointer to the destination vector
@@ -873,7 +870,7 @@ Ricepid* ricepidVectorGet(ricepidVector* vect, int index) {
 	return return_elem;
 }
 
-/*
+/**
  * Initializes a vector
  */
 ricencoderVector* initRicencoderVector() {
@@ -884,7 +881,7 @@ ricencoderVector* initRicencoderVector() {
 	return vect;
 }
 
-/*
+/**
  * Adds an element to the vector
  *
  * @param vect A pointer to the destination vector
@@ -909,7 +906,7 @@ int ricencoderVectorAppend(ricencoderVector* vect, Ricencoder* element) {
 	return 1;
 }
 
-/*
+/**
  * Returns the element at a given index
  *
  * @param vect A pointer to the destination vector
@@ -928,7 +925,7 @@ Ricencoder* ricencoderVectorGet(ricencoderVector* vect, int index) {
 	return return_elem;
 }
 
-/*
+/**
  * Initializes a vector
  */
 ricepotVector* initRicepotVector() {
@@ -939,7 +936,7 @@ ricepotVector* initRicepotVector() {
 	return vect;
 }
 
-/*
+/**
  * Adds an element to the vector
  *
  * @param vect A pointer to the destination vector
@@ -964,7 +961,7 @@ int ricepotVectorAppend(ricepotVector* vect, Ricepot* element) {
 	return 1;
 }
 
-/*
+/**
  * Returns the element at a given index
  *
  * @param vect A pointer to the destination vector
@@ -983,7 +980,7 @@ Ricepot* ricepotVectorGet(ricepotVector* vect, int index) {
 	return return_elem;
 }
 
-/*
+/**
  * Initializes a vector
  */
 ricesolenoidVector* initRicesolenoidVector() {
@@ -994,7 +991,7 @@ ricesolenoidVector* initRicesolenoidVector() {
 	return vect;
 }
 
-/*
+/**
  * Adds an element to the vector
  *
  * @param vect A pointer to the destination vector
@@ -1019,7 +1016,7 @@ int ricesolenoidVectorAppend(ricesolenoidVector* vect, Ricesolenoid* element) {
 	return 1;
 }
 
-/*
+/**
  * Returns the element at a given index
  *
  * @param vect A pointer to the destination vector
@@ -1038,7 +1035,7 @@ Ricesolenoid* ricesolenoidVectorGet(ricesolenoidVector* vect, int index) {
 	return return_elem;
 }
 
-/*
+/**
  * Initializes a vector
  */
 ricebuttonVector* initRicebuttonVector() {
@@ -1049,7 +1046,7 @@ ricebuttonVector* initRicebuttonVector() {
 	return vect;
 }
 
-/*
+/**
  * Adds an element to the vector
  *
  * @param vect A pointer to the destination vector
@@ -1074,7 +1071,7 @@ int ricebuttonVectorAppend(ricebuttonVector* vect, Ricebutton* element) {
 	return 1;
 }
 
-/*
+/**
  * Returns the element at a given index
  *
  * @param vect A pointer to the destination vector
