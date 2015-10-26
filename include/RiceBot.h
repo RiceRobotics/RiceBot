@@ -402,9 +402,36 @@ Ricepid* initRicepid(int* sensor, float kP, float kI, float kD, Ricemotor* motor
 Ricencoder* initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char imeAddress,
 		unsigned char portTop, unsigned char portBot, bool reverse);
 
+/**
+ * The Ricencoder contains data for either an IME or a quadrature encoder
+ *
+ * @param ticksPerRev The number of ticks per revolution of the encoder
+ * 						627.2 for the 393 IME in high torque mode (factory default)
+ * 						392 for the 393 IME in high speed mode
+ * 						360 for the Quadrature Encoder
+ * @param mult A multiplier to use as compensation for gear ratio
+ * @param imeAddress The address of the IME, in order of the chain from the Cortex. Starts at 0
+ * @param reverse Whether the Ricencoder should count in the reverse direction
+ *
+ * @return The initialized and configured Ricencoder
+ */
 Ricencoder* initRicencoderIME(float ticksPerRev, int mult, unsigned char imeAddress,
 		bool reverse);
 
+/**
+ * The Ricencoder contains data for either an IME or a quadrature encoder
+ *
+ * @param ticksPerRev The number of ticks per revolution of the encoder
+ * 						627.2 for the 393 IME in high torque mode (factory default)
+ * 						392 for the 393 IME in high speed mode
+ * 						360 for the Quadrature Encoder
+ * @param mult A multiplier to use as compensation for gear ratio
+ * @param portTop (If not IME) The port on the Cortex which the top wire of the encoder is plugged into
+ * @param portBot (If not IME) The port on the Cortex which the bottom wire of the encoder is plugged into
+ * @param reverse Whether the Ricencoder should count in the reverse direction
+ *
+ * @return The initialized and configured Ricencoder
+ */
 Ricencoder* initRicencoderQUAD(float ticksPerRev, int mult, unsigned char portTop,
 		unsigned char portBot, bool reverse);
 
