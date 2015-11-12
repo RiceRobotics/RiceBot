@@ -217,6 +217,7 @@ typedef struct ricebuttonVector {
 } ricebuttonVector;
 
 //Constants
+#define ever ;;
 #define MATH_PI 3.14159265358979323846
 
 //Teams
@@ -224,11 +225,12 @@ typedef struct ricebuttonVector {
 #define BLUE 1
 
 //Control Style
-#define CTTANKDRIVE  	0
-#define CTARCADEDRIVE 	1
-#define CTCHEEZYDRIVE  	2
-#define CTMECANUMDRIVE  3
-#define CTHDRIVE  		4
+#define CTTANKDRIVE  			0
+#define CTARCADEDRIVE 		1
+#define CTCHEEZYDRIVE  		2
+#define CTMECANUMDRIVE  	3
+#define CTHDRIVE  				4
+#define CTHDRIVEARCADE 	5
 
 //Defines how the analog joystick inputs translate to motor outputs (CT-)
 int controlStyle;

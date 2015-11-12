@@ -334,7 +334,7 @@ void getJoystickForDriveTrain() {
 		MOTDTFrontRight->out = right * norm;
 		MOTDTFrontMidRight->out = right * norm;
 		MOTDTMidRight->out = right * norm;
-		MOTDTBackRight->out = (right * norm);
+		MOTDTBackRight->out = right * norm;
 		break;
 	case CTCHEEZYDRIVE:
 		left = y1 + x2;
@@ -342,11 +342,14 @@ void getJoystickForDriveTrain() {
 		norm = normalize(left, right);
 
 		MOTDTFrontLeft->out = left * norm;
+		MOTDTFrontMidLeft->out = left * norm;
+		MOTDTMidLeft->out = left * norm;
 		MOTDTBackLeft->out = left * norm;
 		MOTDTFrontRight->out = right * norm;
+		MOTDTFrontMidRight->out = right * norm;
+		MOTDTMidRight->out = right * norm;
 		MOTDTBackRight->out = right * norm;
 		break;
-
 	case CTMECANUMDRIVE:
 		MOTDTFrontLeft->out = y1 + x2 + x1;
 		MOTDTBackLeft->out = y1 + x2 - x1;
@@ -360,11 +363,34 @@ void getJoystickForDriveTrain() {
 		norm = normalize(left, right);
 
 		MOTDTFrontLeft->out = left * norm;
+		MOTDTFrontMidLeft->out = left * norm;
+		MOTDTMidLeft->out = left * norm;
 		MOTDTBackLeft->out = left * norm;
+
 		MOTDTFrontRight->out = right * norm;
+		MOTDTFrontMidRight->out = right * norm;
+		MOTDTMidRight->out = right * norm;
 		MOTDTBackRight->out = right * norm;
+
 		MOTDTHDrive->out = x1;
 		break;
+	case CTHDRIVEARCADE:
+			left = y1 + x1;
+			right = y1 - x1;
+			norm = normalize(left, right);
+
+			MOTDTFrontLeft->out = left * norm;
+			MOTDTFrontMidLeft->out = left * norm;
+			MOTDTMidLeft->out = left * norm;
+			MOTDTBackLeft->out = left * norm;
+
+			MOTDTFrontRight->out = right * norm;
+			MOTDTFrontMidRight->out = right * norm;
+			MOTDTMidRight->out = right * norm;
+			MOTDTBackRight->out = right * norm;
+
+			MOTDTHDrive->out = x2;
+			break;
 	default:
 		break;
 	}
