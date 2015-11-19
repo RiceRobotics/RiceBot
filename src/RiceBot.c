@@ -3,11 +3,15 @@
  *
  * This library was written for use by the Rice University Vex U Robotics team.
  * All are welcome to use and modify the library, so long as due credit is given to the creator.
- * If you have questions/comments/suggestions, email me at Keiko.F.Kaplan@rice.edu
+ *
+ * If you have questions/comments/suggestions, email me at keikokaplan@gmail.com
  *
  * This library was written to be used with the Purdue Robotic Operating System.
  *
- * Author: Keiko Kaplan
+ * Created on: Aug 29, 2014
+ * Author: 			Keiko Kaplan
+ * Contributors: Cannon Lewis
+ * 						Lewis Lewis
  */
 
 #include "RiceBot.h"
