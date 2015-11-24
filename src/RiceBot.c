@@ -50,62 +50,15 @@ void riceBotInitialize() {
 	MOTDTBack = MOTDefault;
 	MOTDTHDrive = MOTDefault;
 
-	//	MOTARMFront = MOTDefault;
-	//	MOTARMBack = MOTDefault;
-	//	MOTARMTop = MOTDefault;
-	//	MOTARMMiddle = MOTDefault;
-	//	MOTARMBottom = MOTDefault;
-	//	MOTARMLeft = MOTDefault;
-	//	MOTARMRight = MOTDefault;
-	//	MOTARMTopRight = MOTDefault;
-	//	MOTARMBottomRight = MOTDefault;
-	//	MOTARMTopLeft = MOTDefault;
-	//	MOTARMBottomLeft = MOTDefault;
-	//	MOTARMOuterLeft = MOTDefault;
-	//	MOTARMOuterRight = MOTDefault;
-	//	MOTARMInnerLeft = MOTDefault;
-	//	MOTARMInnerRight = MOTDefault;
-
-	//	MOTCOL = MOTDefault;
-	//	MOTCOLLeft = MOTDefault;
-	//	MOTCOLRight = MOTDefault;
-	//	MOTCLAW = MOTDefault;
-	//	MOTConveyor = MOTDefault;
-
 	Ricemotor* array[2] = {MOTDefault, MOTDefault};
 	PidDefault = initRicepid(0, 0, 0, 0, array);
-	//	PidDTLeft = PidDefault;
-	//	PidDTRight = PidDefault;
-	//	PidARMLeft = PidDefault;
-	//	PidARMRight = PidDefault;
-	//	PidARMBottom = PidDefault;
-	//	PidARMTop = PidDefault;
-	//	PidARMFront = PidDefault;
-	//	PidARMTop = PidDefault;
-	//	PidARMBottom = PidDefault;
 
 	EncDefault = initRicencoder(0, 0, 0, 0, 0, 0, false);
-	//	EncDTLeft = EncDefault;
-	//	EncDTRight = EncDefault;
-	//	EncARMLeft = EncDefault;
-	//	EncARMRight = EncDefault;
-	//	EncARMBottom = EncDefault;
-	//	EncARMTop = EncDefault;
-	//	EncARMFront = EncDefault;
 
 	PotDefault = initRicepot(0, 0);
-	//	PotARMFront = PotDefault;
-	//	PotARMLeft = PotDefault;
-	//	PotARMRight = PotDefault;
 
 	ButDefault = initRicebutton(0);
-	//	ButConLeft = ButDefault;
-	//	ButConRight = ButDefault;
-	//	ButARMBase = ButDefault;
-	//	ButARMFrontLeft = ButDefault;
-	//	ButARMFrontRight = ButDefault;
 
-	//	imeInitializeAll();
 	printf("Initialization complete\n\r");
 }
 
@@ -379,22 +332,22 @@ void getJoystickForDriveTrain() {
 		MOTDTHDrive->out = x1;
 		break;
 	case CTHDRIVEARCADE:
-			left = y1 + x1;
-			right = y1 - x1;
-			norm = normalize(left, right);
+		left = y1 + x1;
+		right = y1 - x1;
+		norm = normalize(left, right);
 
-			MOTDTFrontLeft->out = left * norm;
-			MOTDTFrontMidLeft->out = left * norm;
-			MOTDTMidLeft->out = left * norm;
-			MOTDTBackLeft->out = left * norm;
+		MOTDTFrontLeft->out = left * norm;
+		MOTDTFrontMidLeft->out = left * norm;
+		MOTDTMidLeft->out = left * norm;
+		MOTDTBackLeft->out = left * norm;
 
-			MOTDTFrontRight->out = right * norm;
-			MOTDTFrontMidRight->out = right * norm;
-			MOTDTMidRight->out = right * norm;
-			MOTDTBackRight->out = right * norm;
+		MOTDTFrontRight->out = right * norm;
+		MOTDTFrontMidRight->out = right * norm;
+		MOTDTMidRight->out = right * norm;
+		MOTDTBackRight->out = right * norm;
 
-			MOTDTHDrive->out = x2;
-			break;
+		MOTDTHDrive->out = x2;
+		break;
 	default:
 		break;
 	}
