@@ -59,6 +59,7 @@ void riceBotInitialize() {
 
 	ButDefault = initRicebutton(0);
 
+	printf("Power Levels: %d | %d mVolts\n\r", powerLevelMain(), powerLevelBackup());
 	printf("Initialization complete\n\r");
 }
 
