@@ -51,7 +51,7 @@ void riceBotInitialize() {
 	MOTDTHDrive = MOTDefault;
 
 	Ricemotor* array[2] = {MOTDefault, MOTDefault};
-	PidDefault = initRicepid(0, 0, 0, 0, array);
+	PidDefault = initRicepid(0, 0, 0, 0, 0, array);
 
 	EncDefault = initRicencoder(0, 0, 0, 0, 0, 0, false);
 
@@ -85,6 +85,7 @@ Ricemotor* initRicemotor(unsigned char port, int reflected) {
  * Initializes a Pid type
  *
  * @param *sensor A pointer to the sensor's value field
+ * @param tolerance Acceptable variance from the setpoint
  * @param kP The coefficient for the proportional term
  * @param kI The coefficient for the integral term
  * @param kD The coefficient for the derivative term
@@ -92,10 +93,13 @@ Ricemotor* initRicemotor(unsigned char port, int reflected) {
  *
  * @return The initialized and configured Pid
  */
-Ricepid* initRicepid(int* sensor, float kP, float kI, float kD, Ricemotor* motors[2]) {
+Ricepid* initRicepid(int* sensor, int tolerance, float kP, float kI, float kD, Ricemotor* motors[2]) {
 	Ricepid *p = malloc(sizeof(Ricepid));
 	p->sensor = sensor;
 	p->running = 0;
+	p->tolerance = tolerance;
+	p->atSetpoint = 0;
+	p->atSetpointTime = 0;
 	p->setPoint = 0;
 	p->current = 0;
 	p->error = 0;
@@ -372,8 +376,20 @@ void updatePid(Ricepid *pidLoop) {
 				(pidLoop->integral * pidLoop->kI) + (pidLoop->derivative * pidLoop->kD));
 
 		pidLoop->lastError = pidLoop->error;
-		for(int i = 0; i < 2; i++) {
-			pidLoop->pidMotors[i]->out = pidLoop->output;
+		if(!pidLoop->atSetpoint) {
+			for(int i = 0; i < 2; i++) {
+				pidLoop->pidMotors[i]->out = pidLoop->output;
+			}
+		}
+
+		if(abs(pidLoop->error) > pidLoop->tolerance) {
+			pidLoop->atSetpointTime = millis();
+		}
+		if(millis() - pidLoop->atSetpointTime > 350) {
+			pidLoop->atSetpoint = 1;
+		}
+		else {
+			pidLoop->atSetpoint = 0;
 		}
 	}
 }

@@ -38,6 +38,9 @@ typedef struct motorStruct {
  * @param *sensor A pointer to the sensor's value field
  * @param running 1 if the Pid instance should be processed/set to motors, else 0
  * @param setPoint The target value for the loop
+ * @param tolerance Acceptable variance from the setpoint
+ * @param atSetpoint 1 if current is within tolerance of the setpoint
+ * @param atSetpointTime How long we've been at setpoint
  * @param current The current value of the sensor
  * @param error The difference between setPoint and &current
  * @param lastError The previous error value, used for derivative calculations
@@ -53,6 +56,9 @@ typedef struct pidStruct {
 	int* sensor;
 	int running;
 	int setPoint;
+	int tolerance;
+	int atSetpoint;
+	long atSetpointTime;
 	int current;
 	float error;
 	float lastError;
@@ -329,6 +335,7 @@ Ricemotor* initRicemotor(unsigned char port, int reflected);
  * Initializes a Pid type
  *
  * @param *sensor A pointer to the sensor's value field
+ * @param tolerance Acceptable variance from the setpoint
  * @param kP The coefficient for the proportional term
  * @param kI The coefficient for the integral term
  * @param kD The coefficient for the derivative term
@@ -336,7 +343,7 @@ Ricemotor* initRicemotor(unsigned char port, int reflected);
  *
  * @return The initialized and configured Pid
  */
-Ricepid* initRicepid(int* sensor, float kP, float kI, float kD, Ricemotor* motors[2]);
+Ricepid* initRicepid(int* sensor, int tolerance, float kP, float kI, float kD, Ricemotor* motors[2]);
 
 /**
  * The Ricencoder contains data for either an IME or a quadrature encoder
