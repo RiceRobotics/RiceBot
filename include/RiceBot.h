@@ -154,6 +154,32 @@ typedef struct RicebuttonStruct {
 } Ricebutton;
 
 /**
+ * stuff stuff stuff
+ *
+ * The Ricesensordigital is a wrapper for cortex digital input
+ *
+ * @param port The digital port on the Cortex which the sensor is plugged into
+ * @param state The current state of the sensor, either HIGH (Released) or LOW (Pressed)
+ */
+typedef struct RicesensordigitalStruct {
+	unsigned char port;
+	int state;
+} Ricesensordigital;
+
+/**
+ * The Ricesensoranalog is a wrapper for cortex analog input
+ *
+ * @param port The digital port on the Cortex which the sensor is plugged into
+ * @param state The current state of the sensor, from 0 to 4095 to designate approximate input voltage
+ * @param cal True if you want to calibrate the sensor
+ */
+typedef struct RicesensoranalogStruct {
+	unsigned char port;
+	int state;
+	bool cal;
+} Ricesensoranalog;
+
+/**
  * The Motor Vector is a variable length array of Motor structs
  *
  * @param elem_total  Number of elements currently allocated for, initialized to 10
@@ -231,6 +257,18 @@ typedef struct ricebuttonVector {
 	Ricebutton* data[]; /* Pointer to actual array of data */
 } ricebuttonVector;
 
+typedef struct RiceseonsordigitalVector {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Ricesensordigital* data[]; /* Pointer to actual array of data */
+} RicesensordigitalVector;
+
+typedef struct RicesensoranalogVector {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Ricesensoranalog* data[]; /* Pointer to actual array of data */
+} RicesensoranalogVector;
+
 //Constants
 #define ever ;;
 #define MATH_PI 3.14159265358979323846
@@ -291,6 +329,8 @@ Ricemotor* MOTDTBack;
 Ricemotor* MOTDTHDrive;
 
 ricemotorVector* MOTVector;
+RicesensordigitalVector* DigitalVector;
+RicesensoranalogVector* AnalogVector;
 
 //Default Ricepid
 Ricepid* PidDefault;
@@ -316,6 +356,15 @@ ricesolenoidVector* SolVector;
 
 //Default Ricebutton
 Ricebutton* ButDefault;
+
+Ricesensordigital* DigitalDefault;
+Ricesensoranalog* AnalogDefault;
+
+//Ricebutton* ButConLeft;
+//Ricebutton* ButConRight;
+//Ricebutton* ButARMBase;
+//Ricebutton* ButARMFrontLeft;
+//Ricebutton* ButARMFrontRight;
 
 ricebuttonVector* ButVector;
 
@@ -432,6 +481,8 @@ Ricesolenoid* initRicesolenoid(unsigned char port, int state, int reversed);
  * @return The initialized and configured Ricebutton
  */
 Ricebutton* initRicebutton(unsigned char port);
+Ricesensordigital* initRicesensordigital(unsigned char port);
+Ricesensoranalog* initRicesensoranalog(unsigned char port, bool c);
 
 //Prototyping of all Vector-related functions
 
@@ -470,6 +521,18 @@ ricebuttonVector* initRicebuttonVector();
 int ricebuttonVectorAppend(ricebuttonVector* vect, Ricebutton* element);
 
 Ricebutton* ricebuttonVectorGet(ricebuttonVector* vect, int index);
+
+RicesensoranalogVector* initRicesensoranalogVector();
+
+int RicesensoranalogVectorAppend(RicesensoranalogVector* vect, Ricesensoranalog* element);
+
+Ricesensoranalog* RicesensoranalogVectorGet(RicesensoranalogVector* vect, int index);
+
+RicesensordigitalVector* initRicesensordigitalVector();
+
+int RicesensordigitalVectorAppend(RicesensordigitalVector* vect, Ricesensordigital* element);
+
+Ricesensordigital* RicesensordigitalVectorGet(RicesensordigitalVector* vect, int index);
 
 //Prototyping of other functions
 
@@ -519,6 +582,10 @@ void updateRicegyro(Ricegyro *rg);
 void updateRicesolenoid(Ricesolenoid *rs);
 
 void updateRicebutton(Ricebutton *rb);
+
+void updateRicesensordigital(Ricesensordigital *blah);
+
+void updateRicesensoranalog(Ricesensoranalog *blahh);
 
 void resetRicencoder();
 
