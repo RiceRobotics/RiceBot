@@ -153,6 +153,27 @@ typedef struct RicebuttonStruct {
 	int state;
 } Ricebutton;
 
+typedef struct RiceLocationStruct {
+	int xRaw;
+	int yRaw;
+	int x;
+	int y;
+	int angle;
+} RiceLocation;
+
+typedef struct RPSStruct {
+	RiceLocation *currentLoc;
+	int lastEncLeft;
+	int lastEncRight;
+} RPS;
+
+typedef struct RiceAutonTaskStruct {
+	int index;
+	int isRunning;
+	long startTime;
+	Ricemotor* motors[4];
+} RiceAutonTask;
+
 /**
  * The Motor Vector is a variable length array of Motor structs
  *
@@ -299,6 +320,8 @@ ricepidVector* PidVector;
 
 //Default Ricencoder
 Ricencoder* EncDefault;
+Ricencoder* EncDTLeft;
+Ricencoder* EncDTRight;
 
 ricencoderVector* EncVector;
 
@@ -318,6 +341,14 @@ ricesolenoidVector* SolVector;
 Ricebutton* ButDefault;
 
 ricebuttonVector* ButVector;
+
+
+//Robot Positioning System (RPS)
+int rpsActive;
+RiceLocation* startingLoc;
+RiceLocation* currentLoc;
+RiceLocation* targetLoc;
+RPS* rps;
 
 //Prototyping of RiceStruct initialization functions
 
@@ -433,6 +464,12 @@ Ricesolenoid* initRicesolenoid(unsigned char port, int state, int reversed);
  */
 Ricebutton* initRicebutton(unsigned char port);
 
+RiceLocation* initRiceLocation(int x, int y, int angle);
+
+RPS* initRPS(RiceLocation* loc);
+
+RiceAutonTask* initRiceAutonTask(int index, Ricemotor* motors[4]);
+
 //Prototyping of all Vector-related functions
 
 ricemotorVector* initRicemotorVector();
@@ -519,6 +556,8 @@ void updateRicegyro(Ricegyro *rg);
 void updateRicesolenoid(Ricesolenoid *rs);
 
 void updateRicebutton(Ricebutton *rb);
+
+void updateRPS(RiceLocation *rl);
 
 void resetRicencoder();
 

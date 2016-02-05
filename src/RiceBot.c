@@ -54,10 +54,17 @@ void riceBotInitialize() {
 	PidDefault = initRicepid(0, 0, 0, 0, 0, array);
 
 	EncDefault = initRicencoder(0, 0, 0, 0, 0, 0, false);
+	EncDTLeft = EncDefault;
+	EncDTRight = EncDefault;
 
 	PotDefault = initRicepot(0, 0);
 
 	ButDefault = initRicebutton(0);
+
+	//Can re-initialize in robot-specific code if a different starting loc is desired.
+	startingLoc = initRiceLocation(0, 0, 0);
+	currentLoc = initRiceLocation(0, 0, 0);
+	targetLoc = NULL;
 
 	printf("Power Levels: %d | %d mVolts\n\r", powerLevelMain(), powerLevelBackup());
 	printf("Initialization complete\n\r");
@@ -257,6 +264,36 @@ Ricebutton* initRicebutton(unsigned char port) {
 	return r;
 }
 
+RiceLocation* initRiceLocation(int x, int y, int angle) {
+	RiceLocation* r = malloc(sizeof(RiceLocation));
+	r->xRaw = x;
+	r->yRaw = y;
+	r->x = x;
+	r->y = y;
+	r->angle = angle;
+	return r;
+}
+
+RPS* initRPS(RiceLocation* loc) {
+	RPS *r = malloc(sizeof(RPS));
+	r->currentLoc = loc;
+	r->lastEncLeft = 0;
+	r->lastEncRight = 0;
+	return r;
+}
+
+
+RiceAutonTask* initRiceAutonTask(int index, Ricemotor* motors[]) {
+	RiceAutonTask* r = malloc(sizeof(RiceAutonTask));
+	r->index = index;
+	r->isRunning = 0;
+	r->startTime = 0;
+	for(int i = 0; i < 4; i++) {
+		r->motors[i] = motors[i];
+	}
+	return r;
+}
+
 /**
  * Checks joystick input and sets all Motor structs to appropriate output
  */
@@ -356,6 +393,11 @@ void getJoystickForDriveTrain() {
 	default:
 		break;
 	}
+	if(rpsActive && left != NULL && right != NULL) {
+		if((left > 0 && right > 0) || (left < 0 && right < 0)) {
+			updateRPS(rps, )
+		}
+	}
 }
 
 /**
@@ -432,6 +474,16 @@ void updateRicegyro(Ricegyro *rg) {
 void updateRicebutton(Ricebutton *rb) {
 	if(rb != NULL) {
 		rb->state = digitalRead(rb->port);
+	}
+}
+
+void updateRPS(RPS *rps, int encLeft, int encRight) {
+	if(rps != NULL) {
+		rps->currentLoc->angle = gyro->value;
+		rps->currentLoc->xRaw += ((encLeft - rps->lastEncLeft + encRight - rps->lastEncRight) / 2)
+								* cos(rps->currentLoc->angle);
+		rps->currentLoc->yRaw += ((encLeft - rps->lastEncLeft + encRight - rps->lastEncRight) / 2)
+								* sin(rps->currentLoc->angle);
 	}
 }
 
