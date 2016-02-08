@@ -20,7 +20,6 @@
 void riceBotInitializeIO() {
 	//  SolVector = initRicesolenoidVector();
 	//  SolDefault = initRicesolenoid(0, LOW, false);
-	//  SolClaw = SolDefault;
 }
 
 /**
@@ -36,8 +35,8 @@ void riceBotInitialize() {
 	EncVector = initRicencoderVector();
 	PotVector = initRicepotVector();
 	ButVector = initRicebuttonVector();
-	AnalogVector = initRicesensoranalogVector();
-	DigitalVector = initRicesensordigitalVector();
+	AnalogVector = initRicesensorAnalogVector();
+	DigitalVector = initRicesensorDigitalVector();
 
 	MOTDefault = initRicemotor(0, 1);
 	MOTDTFront = MOTDefault;
@@ -64,12 +63,12 @@ void riceBotInitialize() {
 	ButDefault = initRicebutton(0);
 
 	//Can re-initialize in robot-specific code if a different starting loc is desired.
-	startingLoc = initRiceLocation(0, 0, 0);
-	currentLoc = initRiceLocation(0, 0, 0);
-	targetLoc = NULL;
+//	startingLoc = initRicelocation(0, 0, 0);
+//	currentLoc = initRicelocation(0, 0, 0);
+//	targetLoc = NULL;
 
-	DigitalDefault = initRicesensordigital(0);
-	AnalogDefault = initRicesensoranalog(0, false);
+	DigitalDefault = initRicesensorDigital(0);
+	AnalogDefault = initRicesensorAnalog(0, false);
 
 	printf("Power Levels: %d | %d mVolts\n\r", powerLevelMain(), powerLevelBackup());
 	printf("Initialization complete\n\r");
@@ -271,8 +270,8 @@ Ricebutton* initRicebutton(unsigned char port) {
 	return r;
 }
 
-RiceLocation* initRiceLocation(int x, int y, int angle) {
-	RiceLocation* r = malloc(sizeof(RiceLocation));
+Ricelocation* initRicelocation(int x, int y, int angle) {
+	Ricelocation* r = malloc(sizeof(Ricelocation));
 	r->xRaw = x;
 	r->yRaw = y;
 	r->x = x;
@@ -281,8 +280,8 @@ RiceLocation* initRiceLocation(int x, int y, int angle) {
 	return r;
 }
 
-RPS* initRPS(RiceLocation* loc) {
-	RPS *r = malloc(sizeof(RPS));
+Ricerps* initRicerps(Ricelocation* loc) {
+	Ricerps *r = malloc(sizeof(Ricerps));
 	r->currentLoc = loc;
 	r->lastEncLeft = 0;
 	r->lastEncRight = 0;
@@ -290,8 +289,8 @@ RPS* initRPS(RiceLocation* loc) {
 }
 
 
-RiceAutonTask* initRiceAutonTask(int index, Ricemotor* motors[]) {
-	RiceAutonTask* r = malloc(sizeof(RiceAutonTask));
+RiceautonTask* initRiceautonTask(int index, Ricemotor* motors[]) {
+	RiceautonTask* r = malloc(sizeof(RiceautonTask));
 	r->index = index;
 	r->isRunning = 0;
 	r->startTime = 0;
@@ -301,17 +300,17 @@ RiceAutonTask* initRiceAutonTask(int index, Ricemotor* motors[]) {
 	return r;
 }
 
-Ricesensordigital* initRicesensordigital(unsigned char port) {
-	Ricesensordigital *r = malloc(sizeof(Ricesensordigital));
+RicesensorDigital* initRicesensorDigital(unsigned char port) {
+	RicesensorDigital *r = malloc(sizeof(RicesensorDigital));
 	r->port = port;
 	pinMode(port, INPUT);
 	r->state = digitalRead(port);
-	RicesensordigitalVectorAppend(DigitalVector, r);
+	ricesensorDigitalVectorAppend(DigitalVector, r);
 	return r;
 }
 
-Ricesensoranalog* initRicesensoranalog(unsigned char port, bool c) {
-	Ricesensoranalog *r = malloc(sizeof(Ricesensordigital));
+RicesensorAnalog* initRicesensorAnalog(unsigned char port, bool c) {
+	RicesensorAnalog *r = malloc(sizeof(RicesensorAnalog));
 	r->port = port;
 	pinMode(port, INPUT);
 	r->cal = c;
@@ -320,7 +319,7 @@ Ricesensoranalog* initRicesensoranalog(unsigned char port, bool c) {
 	} else {
 		r->state = analogRead(port);
 	}
-	RicesensoranalogVectorAppend(AnalogVector, r);
+	ricesensorAnalogVectorAppend(AnalogVector, r);
 	return r;
 }
 
@@ -425,7 +424,7 @@ void getJoystickForDriveTrain() {
 	}
 	if(rpsActive && left != NULL && right != NULL) {
 		if((left > 0 && right > 0) || (left < 0 && right < 0)) {
-//			updateRPS(rps, )
+//			updateRicerps(Ricerps, )
 		}
 	}
 }
@@ -509,23 +508,23 @@ void updateRicebutton(Ricebutton *rb) {
 	}
 }
 
-void updateRPS(RPS *rps, int encLeft, int encRight) {
-	if(rps != NULL) {
-		rps->currentLoc->angle = gyro->value;
-		rps->currentLoc->xRaw += ((encLeft - rps->lastEncLeft + encRight - rps->lastEncRight) / 2)
-								* cos(rps->currentLoc->angle);
-		rps->currentLoc->yRaw += ((encLeft - rps->lastEncLeft + encRight - rps->lastEncRight) / 2)
-								* sin(rps->currentLoc->angle);
+void updateRPS(Ricerps *Ricerps, int encLeft, int encRight) {
+	if(Ricerps != NULL) {
+		Ricerps->currentLoc->angle = gyro->value;
+		Ricerps->currentLoc->xRaw += ((encLeft - Ricerps->lastEncLeft + encRight - Ricerps->lastEncRight) / 2)
+								* cos(Ricerps->currentLoc->angle);
+		Ricerps->currentLoc->yRaw += ((encLeft - Ricerps->lastEncLeft + encRight - Ricerps->lastEncRight) / 2)
+								* sin(Ricerps->currentLoc->angle);
 	}
 }
 
-void updateRicesensordigital(Ricesensordigital *sen){
+void updateRicesensorDigital(RicesensorDigital *sen){
 	if (sen != NULL) {
 		sen->state = digitalRead(sen->port);
 	}
 }
 
-void updateRicesensoranalog(Ricesensoranalog *sen){
+void updateRicesensorAnalog(RicesensorAnalog *sen){
 	if (sen != NULL) {
 		if(sen->cal){
 			sen->state = analogReadCalibrated(sen->port);
@@ -842,10 +841,10 @@ void IOTask(void *ignore) {
 
 		updateRicegyro(gyro);
 		for (int i = 1; i < DigitalVector->elem_current; i++) {
-			updateRicesensordigital(RicesensordigitalVectorGet(DigitalVector, i));
+			updateRicesensorDigital(ricesensorDigitalVectorGet(DigitalVector, i));
 		}
 		for (int i = 1; i < AnalogVector->elem_current; i++) {
-			updateRicesensoranalog(RicesensoranalogVectorGet(AnalogVector, i));
+			updateRicesensorAnalog(ricesensorAnalogVectorGet(AnalogVector, i));
 		}
 		delay(10);
 	}
@@ -863,8 +862,8 @@ void PidTask(void *ignore) {
 /**
  * Initializes a vector
  */
-ricemotorVector* initRicemotorVector() {
-	ricemotorVector* vect = malloc(
+RicemotorVector* initRicemotorVector() {
+	RicemotorVector* vect = malloc(
 			sizeof(vect->elem_current) + sizeof(vect->elem_total)
 					+ 10 * (sizeof(Ricemotor*)));
 	vect->elem_total = 14;
@@ -881,7 +880,7 @@ ricemotorVector* initRicemotorVector() {
  *
  * @return 1 if successful and 0 otherwise
  */
-int ricemotorVectorAppend(ricemotorVector* vect, Ricemotor* element) {
+int ricemotorVectorAppend(RicemotorVector* vect, Ricemotor* element) {
 	vect->data[vect->elem_current] = element;
 	vect->elem_current++;
 	if (vect->elem_current >= vect->elem_total) {
@@ -911,7 +910,7 @@ int ricemotorVectorAppend(ricemotorVector* vect, Ricemotor* element) {
  *
  * @return -1 if no element at index.
  */
-Ricemotor* ricemotorVectorGet(ricemotorVector* vect, int index) {
+Ricemotor* ricemotorVectorGet(RicemotorVector* vect, int index) {
 	Ricemotor* return_elem;
 	if (index < vect->elem_current && index >= 0) {
 		return_elem = vect->data[index];
@@ -925,8 +924,8 @@ Ricemotor* ricemotorVectorGet(ricemotorVector* vect, int index) {
 /**
  * Initializes a vector
  */
-ricepidVector* initRicepidVector() {
-	ricepidVector* vect = malloc(
+RicepidVector* initRicepidVector() {
+	RicepidVector* vect = malloc(
 			sizeof(vect->elem_current) + sizeof(vect->elem_total)
 					+ 10 * (sizeof(Ricepid*)));
 	vect->elem_total = 10;
@@ -943,7 +942,7 @@ ricepidVector* initRicepidVector() {
  *
  * @return 1 if successful and 0 otherwise
  */
-int ricepidVectorAppend(ricepidVector* vect, Ricepid* element) {
+int ricepidVectorAppend(RicepidVector* vect, Ricepid* element) {
 	vect->data[vect->elem_current] = element;
 	vect->elem_current++;
 	if (vect->elem_current >= vect->elem_total) {
@@ -969,7 +968,7 @@ int ricepidVectorAppend(ricepidVector* vect, Ricepid* element) {
  *
  * @return -1 if no element at index.
  */
-Ricepid* ricepidVectorGet(ricepidVector* vect, int index) {
+Ricepid* ricepidVectorGet(RicepidVector* vect, int index) {
 	Ricepid* return_elem;
 	if (index < vect->elem_current && index >= 0) {
 		return_elem = vect->data[index];
@@ -983,10 +982,10 @@ Ricepid* ricepidVectorGet(ricepidVector* vect, int index) {
 /**
  * Initializes a vector of digital sensors
  */
-RicesensordigitalVector* initRicesensordigitalVector() {
-	RicesensordigitalVector* vect = malloc(
+RicesensorDigitalVector* initRicesensorDigitalVector() {
+	RicesensorDigitalVector* vect = malloc(
 			sizeof(vect->elem_current) + sizeof(vect->elem_total)
-					+ 10 * (sizeof(Ricesensordigital*)));
+					+ 10 * (sizeof(RicesensorDigital*)));
 	vect->elem_total = 14;
 	vect->elem_current = 0;
 
@@ -1001,16 +1000,16 @@ RicesensordigitalVector* initRicesensordigitalVector() {
  *
  * @return 1 if successful and 0 otherwise
  */
-int RicesensordigitalVectorAppend(RicesensordigitalVector* vect, Ricesensordigital* element) {
+int ricesensorDigitalVectorAppend(RicesensorDigitalVector* vect, RicesensorDigital* element) {
 	vect->data[vect->elem_current] = element;
 	vect->elem_current++;
 	if (vect->elem_current >= vect->elem_total) {
 		delay(500);
 		printf("Digital sensor Realloc!\n\r");
 		delay(1000);
-		Ricesensordigital* new_data = realloc(vect->data,
+		RicesensorDigital* new_data = realloc(vect->data,
 				sizeof(vect->elem_current) + sizeof(vect->elem_total)
-						+ (vect->elem_total * 2 * sizeof(Ricesensordigital*)));
+						+ (vect->elem_total * 2 * sizeof(RicesensorDigital*)));
 		if (new_data) {
 			*(vect->data) = new_data;
 			vect->elem_total *= 2;
@@ -1031,8 +1030,8 @@ int RicesensordigitalVectorAppend(RicesensordigitalVector* vect, Ricesensordigit
  *
  * @return -1 if no element at index.
  */
-Ricesensordigital* RicesensordigitalVectorGet(RicesensordigitalVector* vect, int index) {
-	Ricesensordigital* return_elem;
+RicesensorDigital* ricesensorDigitalVectorGet(RicesensorDigitalVector* vect, int index) {
+	RicesensorDigital* return_elem;
 	if (index < vect->elem_current && index >= 0) {
 		return_elem = vect->data[index];
 	} else {
@@ -1045,10 +1044,10 @@ Ricesensordigital* RicesensordigitalVectorGet(RicesensordigitalVector* vect, int
 /**
  * Initializes a vector of analog sensors
  */
-RicesensoranalogVector* initRicesensoranalogVector() {
-	RicesensoranalogVector* vect = malloc(
+RicesensorAnalogVector* initRicesensorAnalogVector() {
+	RicesensorAnalogVector* vect = malloc(
 			sizeof(vect->elem_current) + sizeof(vect->elem_total)
-					+ 10 * (sizeof(Ricesensoranalog*)));
+					+ 10 * (sizeof(RicesensorAnalog*)));
 	vect->elem_total = 14;
 	vect->elem_current = 0;
 
@@ -1063,16 +1062,13 @@ RicesensoranalogVector* initRicesensoranalogVector() {
  *
  * @return 1 if successful and 0 otherwise
  */
-int RicesensoranalogVectorAppend(RicesensoranalogVector* vect, Ricesensoranalog* element) {
+int ricesensorAnalogVectorAppend(RicesensorAnalogVector* vect, RicesensorAnalog* element) {
 	vect->data[vect->elem_current] = element;
 	vect->elem_current++;
 	if (vect->elem_current >= vect->elem_total) {
-		delay(500);
-		printf("analog sensor Realloc!\n\r");
-		delay(1000);
-		Ricesensoranalog* new_data = realloc(vect->data,
+		RicesensorAnalog* new_data = realloc(vect->data,
 				sizeof(vect->elem_current) + sizeof(vect->elem_total)
-						+ (vect->elem_total * 2 * sizeof(Ricesensoranalog*)));
+						+ (vect->elem_total * 2 * sizeof(RicesensorAnalog*)));
 		if (new_data) {
 			*(vect->data) = new_data;
 			vect->elem_total *= 2;
@@ -1093,8 +1089,8 @@ int RicesensoranalogVectorAppend(RicesensoranalogVector* vect, Ricesensoranalog*
  *
  * @return -1 if no element at index.
  */
-Ricesensoranalog* RicesensoranalogVectorGet(RicesensoranalogVector* vect, int index) {
-	Ricesensoranalog* return_elem;
+RicesensorAnalog* ricesensorAnalogVectorGet(RicesensorAnalogVector* vect, int index) {
+	RicesensorAnalog* return_elem;
 	if (index < vect->elem_current && index >= 0) {
 		return_elem = vect->data[index];
 	} else {
@@ -1107,8 +1103,8 @@ Ricesensoranalog* RicesensoranalogVectorGet(RicesensoranalogVector* vect, int in
 /**
  * Initializes a vector
  */
-ricencoderVector* initRicencoderVector() {
-	ricencoderVector* vect = malloc(
+RicencoderVector* initRicencoderVector() {
+	RicencoderVector* vect = malloc(
 			sizeof(vect->elem_current) + sizeof(vect->elem_total)
 					+ 10 * (sizeof(Ricencoder*)));
 	vect->elem_total = 10;
@@ -1125,7 +1121,7 @@ ricencoderVector* initRicencoderVector() {
  *
  * @return 1 if successful and 0 otherwise
  */
-int ricencoderVectorAppend(ricencoderVector* vect, Ricencoder* element) {
+int ricencoderVectorAppend(RicencoderVector* vect, Ricencoder* element) {
 	vect->data[vect->elem_current] = element;
 	vect->elem_current++;
 	if (vect->elem_current >= vect->elem_total) {
@@ -1151,7 +1147,7 @@ int ricencoderVectorAppend(ricencoderVector* vect, Ricencoder* element) {
  *
  * @return -1 if no element at index.
  */
-Ricencoder* ricencoderVectorGet(ricencoderVector* vect, int index) {
+Ricencoder* ricencoderVectorGet(RicencoderVector* vect, int index) {
 	Ricencoder* return_elem;
 	if (index < vect->elem_current && index >= 0) {
 		return_elem = vect->data[index];
@@ -1165,8 +1161,8 @@ Ricencoder* ricencoderVectorGet(ricencoderVector* vect, int index) {
 /**
  * Initializes a vector
  */
-ricepotVector* initRicepotVector() {
-	ricepotVector* vect = malloc(
+RicepotVector* initRicepotVector() {
+	RicepotVector* vect = malloc(
 			sizeof(vect->elem_current) + sizeof(vect->elem_total)
 					+ 10 * (sizeof(Ricepot*)));
 	vect->elem_total = 10;
@@ -1183,7 +1179,7 @@ ricepotVector* initRicepotVector() {
  *
  * @return 1 if successful and 0 otherwise
  */
-int ricepotVectorAppend(ricepotVector* vect, Ricepot* element) {
+int ricepotVectorAppend(RicepotVector* vect, Ricepot* element) {
 	vect->data[vect->elem_current] = element;
 	vect->elem_current++;
 	if (vect->elem_current >= vect->elem_total) {
@@ -1209,7 +1205,7 @@ int ricepotVectorAppend(ricepotVector* vect, Ricepot* element) {
  *
  * @return -1 if no element at index.
  */
-Ricepot* ricepotVectorGet(ricepotVector* vect, int index) {
+Ricepot* ricepotVectorGet(RicepotVector* vect, int index) {
 	Ricepot* return_elem;
 	if (index < vect->elem_current && index >= 0) {
 		return_elem = vect->data[index];
@@ -1223,8 +1219,8 @@ Ricepot* ricepotVectorGet(ricepotVector* vect, int index) {
 /**
  * Initializes a vector
  */
-ricesolenoidVector* initRicesolenoidVector() {
-	ricesolenoidVector* vect = malloc(
+RicesolenoidVector* initRicesolenoidVector() {
+	RicesolenoidVector* vect = malloc(
 			sizeof(vect->elem_current) + sizeof(vect->elem_total)
 					+ 10 * (sizeof(Ricesolenoid*)));
 	vect->elem_total = 10;
@@ -1241,7 +1237,7 @@ ricesolenoidVector* initRicesolenoidVector() {
  *
  * @return 1 if successful and 0 otherwise
  */
-int ricesolenoidVectorAppend(ricesolenoidVector* vect, Ricesolenoid* element) {
+int ricesolenoidVectorAppend(RicesolenoidVector* vect, Ricesolenoid* element) {
 	vect->data[vect->elem_current] = element;
 	vect->elem_current++;
 	if (vect->elem_current >= vect->elem_total) {
@@ -1267,7 +1263,7 @@ int ricesolenoidVectorAppend(ricesolenoidVector* vect, Ricesolenoid* element) {
  *
  * @return -1 if no element at index.
  */
-Ricesolenoid* ricesolenoidVectorGet(ricesolenoidVector* vect, int index) {
+Ricesolenoid* ricesolenoidVectorGet(RicesolenoidVector* vect, int index) {
 	Ricesolenoid* return_elem;
 	if (index < vect->elem_current && index >= 0) {
 		return_elem = vect->data[index];
@@ -1281,8 +1277,8 @@ Ricesolenoid* ricesolenoidVectorGet(ricesolenoidVector* vect, int index) {
 /**
  * Initializes a vector
  */
-ricebuttonVector* initRicebuttonVector() {
-	ricebuttonVector* vect = malloc(
+RicebuttonVector* initRicebuttonVector() {
+	RicebuttonVector* vect = malloc(
 			sizeof(vect->elem_current) + sizeof(vect->elem_total)
 					+ 10 * (sizeof(Ricebutton*)));
 	vect->elem_total = 10;
@@ -1299,7 +1295,7 @@ ricebuttonVector* initRicebuttonVector() {
  *
  * @return 1 if successful and 0 otherwise
  */
-int ricebuttonVectorAppend(ricebuttonVector* vect, Ricebutton* element) {
+int ricebuttonVectorAppend(RicebuttonVector* vect, Ricebutton* element) {
 	vect->data[vect->elem_current] = element;
 	vect->elem_current++;
 	if (vect->elem_current >= vect->elem_total) {
@@ -1325,7 +1321,7 @@ int ricebuttonVectorAppend(ricebuttonVector* vect, Ricebutton* element) {
  *
  * @return -1 if no element at index.
  */
-Ricebutton* ricebuttonVectorGet(ricebuttonVector* vect, int index) {
+Ricebutton* ricebuttonVectorGet(RicebuttonVector* vect, int index) {
 	Ricebutton* return_elem;
 	if (index < vect->elem_current && index >= 0) {
 		return_elem = vect->data[index];

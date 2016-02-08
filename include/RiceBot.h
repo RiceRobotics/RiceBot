@@ -8,6 +8,11 @@
  *
  * This library was written to be used with the Purdue Robotic Operating System.
  *
+ * Style Notes:
+ * 			All custom types are called Rice*, capitalized like objects in Java.
+ * 			Rice* is considered one word, so Ricemotor, NOT RiceMotor.
+ * 			Use camelCase for everything else.
+ *
  * Created on: Aug 29, 2014
  * Author: 			Keiko Kaplan
  *
@@ -21,6 +26,10 @@
 #include <math.h>
 #include <API.h>
 
+/**********************************************************************************************
+ * 														Definitions for Rice* types
+ **********************************************************************************************/
+
 /**
  * The Motor type serves as a wrapper to keep track of all data for each motor on the robot.
  *
@@ -28,50 +37,35 @@
  * @param out The power output to the motor, between -127 and 127
  * @param reflected If the output to the motor should be reversed. -1 or 1
  */
-typedef struct motorStruct {
+typedef struct RicemotorStruct {
 	unsigned char port;
 	int out;
 	int reflected;
 } Ricemotor;
 
 /**
- * The Pid type contains all data for any individual pid loop we may wish to run.
+ * The ricesensorDigital is a wrapper for generic cortex digital input
  *
- * @param *sensor A pointer to the sensor's value field
- * @param running 1 if the Pid instance should be processed/set to motors, else 0
- * @param setPoint The target value for the loop
- * @param tolerance Acceptable variance from the setpoint
- * @param atSetpoint 1 if current is within tolerance of the setpoint
- * @param atSetpointTime How long we've been at setpoint
- * @param current The current value of the sensor
- * @param error The difference between setPoint and &current
- * @param lastError The previous error value, used for derivative calculations
- * @param integral A running sum of all previous errors
- * @param derivative The difference between lastError and error
- * @param kP The coefficient for the proportional term
- * @param kI The coefficient for the integral term
- * @param kD The coefficient for the derivative term
- * @param output The value to be set to the motors
- * @param pidMotors An array of up to 2 motors to apply the output value to
+ * @param port The digital port on the Cortex which the sensor is plugged into
+ * @param state The current state of the sensor, either 1 or 0
  */
-typedef struct pidStruct {
-	int* sensor;
-	int running;
-	int setPoint;
-	int tolerance;
-	int atSetpoint;
-	long atSetpointTime;
-	int current;
-	float error;
-	float lastError;
-	long integral;
-	float derivative;
-	float kP;
-	float kI;
-	float kD;
-	int output;
-	Ricemotor* pidMotors[2];
-} Ricepid;
+typedef struct ricesensorDigitalStruct {
+	unsigned char port;
+	int state;
+} RicesensorDigital;
+
+/**
+ * The RicesensorAnalog is a wrapper for generic cortex analog input
+ *
+ * @param port The digital port on the Cortex which the sensor is plugged into
+ * @param state The current state of the sensor, from 0 to 4095 to designate approximate input voltage
+ * @param cal True if you want to calibrate the sensor
+ */
+typedef struct RicesensorAnalogStruct {
+	unsigned char port;
+	int state;
+	bool cal;
+} RicesensorAnalog;
 
 /**
  * The Ricencoder contains data for either an IME or a quadrature encoder
@@ -155,142 +149,72 @@ typedef struct RicebuttonStruct {
 	int state;
 } Ricebutton;
 
-typedef struct RiceLocationStruct {
+/**
+ * The Pid type contains all data for any individual pid loop we may wish to run.
+ *
+ * @param *sensor A pointer to the sensor's value field
+ * @param running 1 if the Pid instance should be processed/set to motors, else 0
+ * @param setPoint The target value for the loop
+ * @param tolerance Acceptable variance from the setpoint
+ * @param atSetpoint 1 if current is within tolerance of the setpoint
+ * @param atSetpointTime How long we've been at setpoint
+ * @param current The current value of the sensor
+ * @param error The difference between setPoint and &current
+ * @param lastError The previous error value, used for derivative calculations
+ * @param integral A running sum of all previous errors
+ * @param derivative The difference between lastError and error
+ * @param kP The coefficient for the proportional term
+ * @param kI The coefficient for the integral term
+ * @param kD The coefficient for the derivative term
+ * @param output The value to be set to the motors
+ * @param pidMotors An array of up to 2 motors to apply the output value to
+ */
+typedef struct RicepidStruct {
+	int* sensor;
+	int running;
+	int setPoint;
+	int tolerance;
+	int atSetpoint;
+	long atSetpointTime;
+	int current;
+	float error;
+	float lastError;
+	long integral;
+	float derivative;
+	float kP;
+	float kI;
+	float kD;
+	int output;
+	Ricemotor* pidMotors[2];
+} Ricepid;
+
+//TODO: Finalize type and add docstring
+typedef struct RicelocationStruct {
 	int xRaw;
 	int yRaw;
 	int x;
 	int y;
 	int angle;
-} RiceLocation;
+} Ricelocation;
 
+//TODO: Finalize type and add docstring
 typedef struct RPSStruct {
-	RiceLocation *currentLoc;
+	Ricelocation *currentLoc;
 	int lastEncLeft;
 	int lastEncRight;
-} RPS;
+} Ricerps;
 
-typedef struct RiceAutonTaskStruct {
+//TODO: Finalize type and add docstring
+typedef struct RiceautonTaskStruct {
 	int index;
 	int isRunning;
 	long startTime;
 	Ricemotor* motors[4];
-} RiceAutonTask;
+} RiceautonTask;
 
-/**
- * stuff stuff stuff
- *
- * The Ricesensordigital is a wrapper for cortex digital input
- *
- * @param port The digital port on the Cortex which the sensor is plugged into
- * @param state The current state of the sensor, either HIGH (Released) or LOW (Pressed)
- */
-typedef struct RicesensordigitalStruct {
-	unsigned char port;
-	int state;
-} Ricesensordigital;
-
-/**
- * The Ricesensoranalog is a wrapper for cortex analog input
- *
- * @param port The digital port on the Cortex which the sensor is plugged into
- * @param state The current state of the sensor, from 0 to 4095 to designate approximate input voltage
- * @param cal True if you want to calibrate the sensor
- */
-typedef struct RicesensoranalogStruct {
-	unsigned char port;
-	int state;
-	bool cal;
-} Ricesensoranalog;
-
-/**
- * The Motor Vector is a variable length array of Motor structs
- *
- * @param elem_total  Number of elements currently allocated for, initialized to 10
- * @param elem_current Current number of elements stored
- * @param data Pointer to actual array of data
- */
-typedef struct motorVector {
-	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
-	unsigned int elem_current; /* Current number of elements stored */
-	Ricemotor* data[]; /* Pointer to actual array of data */
-} ricemotorVector;
-
-/**
- * The Pid Vector is a variable length array of Pid structs
- *
- * @param elem_total  Number of elements currently allocated for, initialized to 10
- * @param elem_current Current number of elements stored
- * @param data Pointer to actual array of data
- */
-typedef struct ricepidVector {
-	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
-	unsigned int elem_current; /* Current number of elements stored */
-	Ricepid* data[]; /* Pointer to actual array of data */
-} ricepidVector;
-
-/**
- * The Ricencoder Vector is a variable length array of Ricencoder structs
- *
- * @param elem_total  Number of elements currently allocated for, initialized to 10
- * @param elem_current Current number of elements stored
- * @param data Pointer to actual array of data
- */
-typedef struct ricencoderVector {
-	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
-	unsigned int elem_current; /* Current number of elements stored */
-	Ricencoder* data[]; /* Pointer to actual array of data */
-} ricencoderVector;
-
-/**
- * The Ricepot Vector is a variable length array of Ricepot structs
- *
- * @param elem_total  Number of elements currently allocated for, initialized to 10
- * @param elem_current Current number of elements stored
- * @param data Pointer to actual array of data
- */
-typedef struct ricepotVector {
-	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
-	unsigned int elem_current; /* Current number of elements stored */
-	Ricepot* data[]; /* Pointer to actual array of data */
-} ricepotVector;
-
-/**
- * The Ricesolenoid Vector is a variable length array of Ricesolenoid structs
- *
- * @param elem_total  Number of elements currently allocated for, initialized to 10
- * @param elem_current Current number of elements stored
- * @param data Pointer to actual array of data
- */
-typedef struct ricesolenoidVector {
-	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
-	unsigned int elem_current; /* Current number of elements stored */
-	Ricesolenoid* data[]; /* Pointer to actual array of data */
-} ricesolenoidVector;
-
-/**
- * The Ricebutton Vector is a variable length array of Ricebutton structs
- *
- * @param elem_total  Number of elements currently allocated for, initialized to 10
- * @param elem_current Current number of elements stored
- * @param data Pointer to actual array of data
- */
-typedef struct ricebuttonVector {
-	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
-	unsigned int elem_current; /* Current number of elements stored */
-	Ricebutton* data[]; /* Pointer to actual array of data */
-} ricebuttonVector;
-
-typedef struct RiceseonsordigitalVector {
-	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
-	unsigned int elem_current; /* Current number of elements stored */
-	Ricesensordigital* data[]; /* Pointer to actual array of data */
-} RicesensordigitalVector;
-
-typedef struct RicesensoranalogVector {
-	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
-	unsigned int elem_current; /* Current number of elements stored */
-	Ricesensoranalog* data[]; /* Pointer to actual array of data */
-} RicesensoranalogVector;
+/**********************************************************************************************
+ * 													Global constants and variables
+ **********************************************************************************************/
 
 //Constants
 #define ever ;;
@@ -308,7 +232,7 @@ typedef struct RicesensoranalogVector {
 #define CTHDRIVE  				4
 #define CTHDRIVEARCADE 	5
 
-//Defines how the analog joystick inputs translate to motor outputs (CT-)
+//Defines how the analog joystick inputs translate to motor outputs (CT*)
 int controlStyle;
 
 //Drivetrain Styles
@@ -320,7 +244,7 @@ int controlStyle;
 #define DTSWERVE 		6
 #define DTHDRIVE 7
 
-//Defines the drivetrain installed on the robot (DT-)
+//Defines the drivetrain installed on the robot (DT*)
 int driveTrainStyle;
 
 //Autonomous Instructions
@@ -351,60 +275,41 @@ Ricemotor* MOTDTBackLeft;
 Ricemotor* MOTDTBack;
 Ricemotor* MOTDTHDrive;
 
-ricemotorVector* MOTVector;
-RicesensordigitalVector* DigitalVector;
-RicesensoranalogVector* AnalogVector;
+RicesensorDigital* DigitalDefault;
+RicesensorAnalog* AnalogDefault;
 
 //Default Ricepid
 Ricepid* PidDefault;
-
-ricepidVector* PidVector;
 
 //Default Ricencoder
 Ricencoder* EncDefault;
 Ricencoder* EncDTLeft;
 Ricencoder* EncDTRight;
 
-ricencoderVector* EncVector;
-
 //Default Ricepot
 Ricepot* PotDefault;
-
-ricepotVector* PotVector;
 
 Ricegyro* gyro;
 
 //Default Ricesolenoid
 Ricesolenoid* SolDefault;
 
-ricesolenoidVector* SolVector;
-
 //Default Ricebutton
 Ricebutton* ButDefault;
 
-Ricesensordigital* DigitalDefault;
-Ricesensoranalog* AnalogDefault;
-
-//Ricebutton* ButConLeft;
-//Ricebutton* ButConRight;
-//Ricebutton* ButARMBase;
-//Ricebutton* ButARMFrontLeft;
-//Ricebutton* ButARMFrontRight;
-
-ricebuttonVector* ButVector;
-
-
 //Robot Positioning System (RPS)
 int rpsActive;
-RiceLocation* startingLoc;
-RiceLocation* currentLoc;
-RiceLocation* targetLoc;
-RPS* rps;
+Ricelocation* startingLoc;
+Ricelocation* currentLoc;
+Ricelocation* targetLoc;
+Ricerps* rps;
 
-//Prototyping of RiceStruct initialization functions
+/**********************************************************************************************
+ * 												Ricetype initialization function prototypes
+ **********************************************************************************************/
 
 /**
- * Initializes a Motor type
+ * Initializes a Ricemotor type
  *
  * @param port The port on the Cortex which the motor is plugged into
  * @param reflected If the output to the motor should be reversed. -1 or 1
@@ -414,21 +319,24 @@ RPS* rps;
 Ricemotor* initRicemotor(unsigned char port, int reflected);
 
 /**
- * Initializes a Pid type
+ * Initializes a generic digital sensor
  *
- * @param *sensor A pointer to the sensor's value field
- * @param tolerance Acceptable variance from the setpoint
- * @param kP The coefficient for the proportional term
- * @param kI The coefficient for the integral term
- * @param kD The coefficient for the derivative term
- * @param motors[2] An array of up to 2 motors to use as output
- *
- * @return The initialized and configured Pid
+ * @param port The port on the Cortex which the sensor is plugged into
+ * @return The initialized and configured digital sensor
  */
-Ricepid* initRicepid(int* sensor, int tolerance, float kP, float kI, float kD, Ricemotor* motors[2]);
+RicesensorDigital* initRicesensorDigital(unsigned char port);
 
 /**
- * The Ricencoder contains data for either an IME or a quadrature encoder
+ * Initializes a generic analog sensor
+ *
+ * @param port The port on the Cortex which the sensor is plugged into
+ * @param cal True if the sensor should be calibrated with its current value
+ * @return The initialized and configured analog sensor
+ */
+RicesensorAnalog* initRicesensorAnalog(unsigned char port, bool cal);
+
+/**
+ * Initializes an encoder
  *
  * @param ticksPerRev The number of ticks per revolution of the encoder
  * 						627.2 for the 393 IME in high torque mode (factory default)
@@ -447,7 +355,7 @@ Ricencoder* initRicencoder(float ticksPerRev, int mult, int isIME, unsigned char
 		unsigned char portTop, unsigned char portBot, bool reverse);
 
 /**
- * The Ricencoder contains data for either an IME or a quadrature encoder
+ * Initializes an IME encoder
  *
  * @param ticksPerRev The number of ticks per revolution of the encoder
  * 						627.2 for the 393 IME in high torque mode (factory default)
@@ -463,7 +371,7 @@ Ricencoder* initRicencoderIME(float ticksPerRev, int mult, unsigned char imeAddr
 		bool reverse);
 
 /**
- * The Ricencoder contains data for either an IME or a quadrature encoder
+ * Initializes a quadrature encoder
  *
  * @param ticksPerRev The number of ticks per revolution of the encoder
  * 						627.2 for the 393 IME in high torque mode (factory default)
@@ -514,72 +422,36 @@ Ricesolenoid* initRicesolenoid(unsigned char port, int state, int reversed);
  * @return The initialized and configured Ricebutton
  */
 Ricebutton* initRicebutton(unsigned char port);
-Ricesensordigital* initRicesensordigital(unsigned char port);
-Ricesensoranalog* initRicesensoranalog(unsigned char port, bool c);
 
-RiceLocation* initRiceLocation(int x, int y, int angle);
+/**
+ * Initializes a Pid type
+ *
+ * @param *sensor A pointer to the sensor's value field
+ * @param tolerance Acceptable variance from the setpoint
+ * @param kP The coefficient for the proportional term
+ * @param kI The coefficient for the integral term
+ * @param kD The coefficient for the derivative term
+ * @param motors[2] An array of up to 2 motors to use as output
+ *
+ * @return The initialized and configured Pid
+ */
+Ricepid* initRicepid(int* sensor, int tolerance, float kP, float kI, float kD, Ricemotor* motors[2]);
 
-RPS* initRPS(RiceLocation* loc);
+Ricelocation* initRicelocation(int x, int y, int angle);
 
-RiceAutonTask* initRiceAutonTask(int index, Ricemotor* motors[4]);
+Ricerps* initRPS(Ricelocation* loc);
 
-//Prototyping of all Vector-related functions
+RiceautonTask* initRiceautonTask(int index, Ricemotor* motors[4]);
 
-ricemotorVector* initRicemotorVector();
-
-int ricemotorVectorAppend(ricemotorVector* vect, Ricemotor* element);
-
-Ricemotor* ricemotorVectorGet(ricemotorVector* vect, int index);
-
-ricepidVector* initRicepidVector();
-
-int ricepidVectorAppend(ricepidVector* vect, Ricepid* element);
-
-Ricepid* ricepidVectorGet(ricepidVector* vect, int index);
-
-ricencoderVector* initRicencoderVector();
-
-int ricencoderVectorAppend(ricencoderVector* vect, Ricencoder* element);
-
-Ricencoder* ricencoderVectorGet(ricencoderVector* vect, int index);
-
-ricepotVector* initRicepotVector();
-
-int ricepotVectorAppend(ricepotVector* vect, Ricepot* element);
-
-Ricepot* ricepotVectorGet(ricepotVector* vect, int index);
-
-ricesolenoidVector* initRicesolenoidVector();
-
-int ricesolenoidVectorAppend(ricesolenoidVector* vect, Ricesolenoid* element);
-
-Ricesolenoid* ricesolenoidVectorGet(ricesolenoidVector* vect, int index);
-
-ricebuttonVector* initRicebuttonVector();
-
-int ricebuttonVectorAppend(ricebuttonVector* vect, Ricebutton* element);
-
-Ricebutton* ricebuttonVectorGet(ricebuttonVector* vect, int index);
-
-RicesensoranalogVector* initRicesensoranalogVector();
-
-int RicesensoranalogVectorAppend(RicesensoranalogVector* vect, Ricesensoranalog* element);
-
-Ricesensoranalog* RicesensoranalogVectorGet(RicesensoranalogVector* vect, int index);
-
-RicesensordigitalVector* initRicesensordigitalVector();
-
-int RicesensordigitalVectorAppend(RicesensordigitalVector* vect, Ricesensordigital* element);
-
-Ricesensordigital* RicesensordigitalVectorGet(RicesensordigitalVector* vect, int index);
-
-//Prototyping of other functions
+/**********************************************************************************************
+ * 												Protyping of other functions
+ **********************************************************************************************/
 
 void riceBotInitializeIO();
 
 /**
  * Call this from the default Initialize function.
- * After, be sure to reinitialize each motor you will be using on your robot.
+ * After, be sure to reinitialize each Ricetype you will be using on your robot.
  */
 void riceBotInitialize();
 
@@ -600,33 +472,44 @@ void updatePid(Ricepid *pidLoop);
 /**
  * Updates the value of any Ricencoder based on a pointer to the struct
  *
- * @param *rc A pointer to the Ricencoder struct
+ * @param *rc A pointer to the Ricencoder
  */
 void updateRicencoder(Ricencoder *rc);
 
 /**
  * Updates the value of any Ricepot based on a pointer to the struct
  *
- * @param *rg A pointer to the Ricepot struct
+ * @param *rg A pointer to the Ricepot
  */
 void updateRicepot(Ricepot *rp);
 
 /**
  * Updates the value of any Ricegyro based on a pointer to the struct
  *
- * @param *rg A pointer to the Ricegyro struct
+ * @param *rg A pointer to the Ricegyro
  */
 void updateRicegyro(Ricegyro *rg);
 
+/**
+ * Updates the value of any Ricesolenoid based on a pointer to the struct
+ *
+ * @param rs A pointer to the Ricesolenoid
+ */
 void updateRicesolenoid(Ricesolenoid *rs);
 
+/**
+ * Updates the value of any Ricebutton based on a pointer to the struct
+ *
+ * @param rb A pointer to the Ricebutton
+ */
 void updateRicebutton(Ricebutton *rb);
 
-void updateRPS(RPS *rps, int encLeft, int encRight);
+//TODO
+void updateRPS(Ricerps *rps, int encLeft, int encRight);
 
-void updateRicesensordigital(Ricesensordigital *blah);
+void updateRicesensorDigital(RicesensorDigital *blah);
 
-void updateRicesensoranalog(Ricesensoranalog *blahh);
+void updateRicesensorAnalog(RicesensorAnalog *blahh);
 
 void resetRicencoder();
 
@@ -659,14 +542,34 @@ void autonomousTask(int instruction, int distance, int pow, long timeout);
  */
 int speedRegulator(int speed);
 
+/**
+ * Normalize the left and right sides of the drivetrain
+ *
+ * @param left The value for the left side of the drivetrain
+ * @param right The value for the right side of the drivetrain
+ *
+ * @return A multiplier for the motor output
+ */
 float normalize(int left, int right);
 
+/**
+ * Shuts down all the motors
+ */
 void DTStopMotors();
 
+/**
+ * A thread to handle all input and output of sensors and motors
+ */
 void IOTask(void *ignore);
 
+/**
+ * A thread to update any PID control that may be in use
+ */
 void PidTask(void *ignore);
 
+/**
+ * A thread for anything else we might need
+ */
 void miscTask(void *ignore);
 
 /**
@@ -700,5 +603,169 @@ int min(int a, int b);
  * @return The largest number
  */
 int max4(int a, int b, int c, int d);
+
+/**
+ * The Motor Vector is a variable length array of Motor structs
+ *
+ * @param elem_total  Number of elements currently allocated for, initialized to 10
+ * @param elem_current Current number of elements stored
+ * @param data Pointer to actual array of data
+ */
+typedef struct RicemotorVectorStruct {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Ricemotor* data[]; /* Pointer to actual array of data */
+} RicemotorVector;
+
+/**
+ * The Pid Vector is a variable length array of Pid structs
+ *
+ * @param elem_total  Number of elements currently allocated for, initialized to 10
+ * @param elem_current Current number of elements stored
+ * @param data Pointer to actual array of data
+ */
+typedef struct RicepidVectorStruct {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Ricepid* data[]; /* Pointer to actual array of data */
+} RicepidVector;
+
+/**
+ * The Ricencoder Vector is a variable length array of Ricencoder structs
+ *
+ * @param elem_total  Number of elements currently allocated for, initialized to 10
+ * @param elem_current Current number of elements stored
+ * @param data Pointer to actual array of data
+ */
+typedef struct RicencoderVectorStruct {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Ricencoder* data[]; /* Pointer to actual array of data */
+} RicencoderVector;
+
+/**
+ * The Ricepot Vector is a variable length array of Ricepot structs
+ *
+ * @param elem_total  Number of elements currently allocated for, initialized to 10
+ * @param elem_current Current number of elements stored
+ * @param data Pointer to actual array of data
+ */
+typedef struct RicepotVectorStruct {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Ricepot* data[]; /* Pointer to actual array of data */
+} RicepotVector;
+
+/**
+ * The Ricesolenoid Vector is a variable length array of Ricesolenoid structs
+ *
+ * @param elem_total  Number of elements currently allocated for, initialized to 10
+ * @param elem_current Current number of elements stored
+ * @param data Pointer to actual array of data
+ */
+typedef struct RicesolenoidVectorStruct {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Ricesolenoid* data[]; /* Pointer to actual array of data */
+} RicesolenoidVector;
+
+/**
+ * The Ricebutton Vector is a variable length array of Ricebutton structs
+ *
+ * @param elem_total  Number of elements currently allocated for, initialized to 10
+ * @param elem_current Current number of elements stored
+ * @param data Pointer to actual array of data
+ */
+typedef struct RicebuttonVectorStruct {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	Ricebutton* data[]; /* Pointer to actual array of data */
+} RicebuttonVector;
+
+/**
+ * The ricesensorDigital Vector is a variable length array of ricesensorDigital structs
+ *
+ * @param elem_total  Number of elements currently allocated for, initialized to 10
+ * @param elem_current Current number of elements stored
+ * @param data Pointer to actual array of data
+ */
+typedef struct RiceseonsorDigitalVectorStruct {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	RicesensorDigital* data[]; /* Pointer to actual array of data */
+} RicesensorDigitalVector;
+
+/**
+ * The RicesensorAnalog Vector is a variable length array of RicesensorAnalog structs
+ *
+ * @param elem_total  Number of elements currently allocated for, initialized to 10
+ * @param elem_current Current number of elements stored
+ * @param data Pointer to actual array of data
+ */
+typedef struct RicesensorAnalogVectorStruct {
+	unsigned int elem_total; /* Number of elements currently allocated for, initialized to 10 */
+	unsigned int elem_current; /* Current number of elements stored */
+	RicesensorAnalog* data[]; /* Pointer to actual array of data */
+} RicesensorAnalogVector;
+
+RicemotorVector* MOTVector;
+
+RicepidVector* PidVector;
+RicencoderVector* EncVector;
+RicepotVector* PotVector;
+RicesolenoidVector* SolVector;
+RicebuttonVector* ButVector;
+RicesensorDigitalVector* DigitalVector;
+RicesensorAnalogVector* AnalogVector;
+
+//Prototyping of all Vector-related functions
+
+RicemotorVector* initRicemotorVector();
+
+int ricemotorVectorAppend(RicemotorVector* vect, Ricemotor* element);
+
+Ricemotor* ricemotorVectorGet(RicemotorVector* vect, int index);
+
+RicepidVector* initRicepidVector();
+
+int ricepidVectorAppend(RicepidVector* vect, Ricepid* element);
+
+Ricepid* ricepidVectorGet(RicepidVector* vect, int index);
+
+RicencoderVector* initRicencoderVector();
+
+int ricencoderVectorAppend(RicencoderVector* vect, Ricencoder* element);
+
+Ricencoder* ricencoderVectorGet(RicencoderVector* vect, int index);
+
+RicepotVector* initRicepotVector();
+
+int ricepotVectorAppend(RicepotVector* vect, Ricepot* element);
+
+Ricepot* ricepotVectorGet(RicepotVector* vect, int index);
+
+RicesolenoidVector* initRicesolenoidVector();
+
+int ricesolenoidVectorAppend(RicesolenoidVector* vect, Ricesolenoid* element);
+
+Ricesolenoid* ricesolenoidVectorGet(RicesolenoidVector* vect, int index);
+
+RicebuttonVector* initRicebuttonVector();
+
+int ricebuttonVectorAppend(RicebuttonVector* vect, Ricebutton* element);
+
+Ricebutton* ricebuttonVectorGet(RicebuttonVector* vect, int index);
+
+RicesensorAnalogVector* initRicesensorAnalogVector();
+
+int ricesensorAnalogVectorAppend(RicesensorAnalogVector* vect, RicesensorAnalog* element);
+
+RicesensorAnalog* ricesensorAnalogVectorGet(RicesensorAnalogVector* vect, int index);
+
+RicesensorDigitalVector* initRicesensorDigitalVector();
+
+int ricesensorDigitalVectorAppend(RicesensorDigitalVector* vect, RicesensorDigital* element);
+
+RicesensorDigital* ricesensorDigitalVectorGet(RicesensorDigitalVector* vect, int index);
 
 #endif /* RICEBOT_H_ */
