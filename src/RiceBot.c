@@ -315,9 +315,9 @@ RicesensorAnalog* initRicesensorAnalog(unsigned char port, bool c) {
 	pinMode(port, INPUT);
 	r->cal = c;
 	if (c) {
-		r->state = analogCalibrate(port);
+		r->value = analogCalibrate(port);
 	} else {
-		r->state = analogRead(port);
+		r->value = analogRead(port);
 	}
 	ricesensorAnalogVectorAppend(AnalogVector, r);
 	return r;
@@ -527,10 +527,10 @@ void updateRicesensorDigital(RicesensorDigital *sen){
 void updateRicesensorAnalog(RicesensorAnalog *sen){
 	if (sen != NULL) {
 		if(sen->cal){
-			sen->state = analogReadCalibrated(sen->port);
+			sen->value = analogReadCalibrated(sen->port);
 		}
 		else{
-			sen->state = analogRead(sen->port);
+			sen->value = analogRead(sen->port);
 		}
 	}
 }

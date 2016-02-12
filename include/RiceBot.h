@@ -58,12 +58,12 @@ typedef struct ricesensorDigitalStruct {
  * The RicesensorAnalog is a wrapper for generic cortex analog input
  *
  * @param port The digital port on the Cortex which the sensor is plugged into
- * @param state The current state of the sensor, from 0 to 4095 to designate approximate input voltage
+ * @param value The current state of the sensor, from 0 to 4095 to designate approximate input voltage
  * @param cal True if you want to calibrate the sensor
  */
 typedef struct RicesensorAnalogStruct {
 	unsigned char port;
-	int state;
+	int value;
 	bool cal;
 } RicesensorAnalog;
 
