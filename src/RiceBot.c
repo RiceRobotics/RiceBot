@@ -55,8 +55,8 @@ void riceBotInitialize() {
 	PidDefault = initRicepid(0, 0, 0, 0, 0, array);
 
 	EncDefault = initRicencoder(0, 0, 0, 0, 0, 0, false);
-	EncDTLeft = EncDefault;
-	EncDTRight = EncDefault;
+//	EncDTLeft = EncDefault;
+//	EncDTRight = EncDefault;
 
 	PotDefault = initRicepot(0, 0);
 
@@ -466,6 +466,11 @@ void updatePid(Ricepid *pidLoop) {
 			pidLoop->atSetpoint = 0;
 		}
 	}
+	else {
+		pidLoop->output = 0;
+		pidLoop->atSetpoint = 0;
+		pidLoop->integral = 0;
+	}
 }
 
 /**
@@ -508,13 +513,18 @@ void updateRicebutton(Ricebutton *rb) {
 	}
 }
 
-void updateRPS(Ricerps *Ricerps, int encLeft, int encRight) {
-	if(Ricerps != NULL) {
-		Ricerps->currentLoc->angle = gyro->value;
-		Ricerps->currentLoc->xRaw += ((encLeft - Ricerps->lastEncLeft + encRight - Ricerps->lastEncRight) / 2)
-								* cos(Ricerps->currentLoc->angle);
-		Ricerps->currentLoc->yRaw += ((encLeft - Ricerps->lastEncLeft + encRight - Ricerps->lastEncRight) / 2)
-								* sin(Ricerps->currentLoc->angle);
+void updateRPS(Ricerps *rps, int encLeft, int encRight) {
+	if(rps != NULL) {
+		rps->currentLoc->angle = gyro->value;
+		if((encLeft > rps->lastEncLeft && encRight > rps->lastEncRight)
+				|| (encLeft < rps->lastEncLeft && encRight < rps->lastEncRight)) {
+			rps->currentLoc->xRaw += ((encLeft - rps->lastEncLeft + encRight - rps->lastEncRight) / 2)
+										* cos(rps->currentLoc->angle);
+			rps->currentLoc->yRaw += ((encLeft - rps->lastEncLeft + encRight - rps->lastEncRight) / 2)
+										* sin(rps->currentLoc->angle);
+		}
+		rps->lastEncLeft = encLeft;
+		rps->lastEncRight = encRight;
 	}
 }
 
@@ -759,9 +769,10 @@ int speedRegulator(int speed) {
 
 float normalize(int left, int right) {
 	float norm = 1;
-	if (max(left, right) > 127) {
+	if (max(left, right) > 127)
 		norm = 127.0 / max(left, right);
-	}
+	else if(min(left, right) < -127)
+		norm = -127.0 / min(left, right);
 	return norm;
 }
 
@@ -826,8 +837,7 @@ void IOTask(void *ignore) {
 		//Update DT Motors
 		for (int i = 1; i < MOTVector->elem_current; i++) {
 			motorSet(ricemotorVectorGet(MOTVector, i)->port,
-					ricemotorVectorGet(MOTVector, i)->out
-							* ricemotorVectorGet(MOTVector, i)->reflected);
+					ricemotorVectorGet(MOTVector, i)->out * ricemotorVectorGet(MOTVector, i)->reflected);
 		}
 		for (int i = 1; i < EncVector->elem_current; i++) {
 			updateRicencoder(ricencoderVectorGet(EncVector, i));
@@ -840,6 +850,7 @@ void IOTask(void *ignore) {
 		}
 
 		updateRicegyro(gyro);
+
 		for (int i = 1; i < DigitalVector->elem_current; i++) {
 			updateRicesensorDigital(ricesensorDigitalVectorGet(DigitalVector, i));
 		}

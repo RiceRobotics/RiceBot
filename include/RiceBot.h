@@ -283,8 +283,8 @@ Ricepid* PidDefault;
 
 //Default Ricencoder
 Ricencoder* EncDefault;
-Ricencoder* EncDTLeft;
-Ricencoder* EncDTRight;
+//Ricencoder* EncDTLeft;
+//Ricencoder* EncDTRight;
 
 //Default Ricepot
 Ricepot* PotDefault;
