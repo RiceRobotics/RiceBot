@@ -55,17 +55,18 @@ void riceBotInitialize() {
 	PidDefault = initRicepid(0, 0, 0, 0, 0, array);
 
 	EncDefault = initRicencoder(0, 0, 0, 0, 0, 0, false);
-//	EncDTLeft = EncDefault;
-//	EncDTRight = EncDefault;
 
 	PotDefault = initRicepot(0, 0);
 
 	ButDefault = initRicebutton(0);
 
 	//Can re-initialize in robot-specific code if a different starting loc is desired.
-//	startingLoc = initRicelocation(0, 0, 0);
-//	currentLoc = initRicelocation(0, 0, 0);
-//	targetLoc = NULL;
+	if(rpsActive) {
+		startingLoc = initRicelocation(0, 0, 0);
+		currentLoc = initRicelocation(0, 0, 0);
+		targetLoc = initRicelocation(0, 0, 0);
+		rps = initRPS(currentLoc);
+	}
 
 	DigitalDefault = initRicesensorDigital(0);
 	AnalogDefault = initRicesensorAnalog(0, false);
@@ -272,15 +273,17 @@ Ricebutton* initRicebutton(unsigned char port) {
 
 Ricelocation* initRicelocation(int x, int y, int angle) {
 	Ricelocation* r = malloc(sizeof(Ricelocation));
-	r->xRaw = x;
-	r->yRaw = y;
+	r->xLeftRaw = x;
+	r->xRightRaw = x;
+	r->yLeftRaw = y;
+	r->yRightRaw = y;
 	r->x = x;
 	r->y = y;
 	r->angle = angle;
 	return r;
 }
 
-Ricerps* initRicerps(Ricelocation* loc) {
+Ricerps* initRPS(Ricelocation* loc) {
 	Ricerps *r = malloc(sizeof(Ricerps));
 	r->currentLoc = loc;
 	r->lastEncLeft = 0;
@@ -513,18 +516,33 @@ void updateRicebutton(Ricebutton *rb) {
 	}
 }
 
-void updateRPS(Ricerps *rps, int encLeft, int encRight) {
+void updateRPS(Ricerps *rps, Ricencoder *encLeft, Ricencoder *encRight) {
 	if(rps != NULL) {
 		rps->currentLoc->angle = gyro->value;
-		if((encLeft > rps->lastEncLeft && encRight > rps->lastEncRight)
-				|| (encLeft < rps->lastEncLeft && encRight < rps->lastEncRight)) {
-			rps->currentLoc->xRaw += ((encLeft - rps->lastEncLeft + encRight - rps->lastEncRight) / 2)
-										* cos(rps->currentLoc->angle);
-			rps->currentLoc->yRaw += ((encLeft - rps->lastEncLeft + encRight - rps->lastEncRight) / 2)
-										* sin(rps->currentLoc->angle);
+
+		int leftDelta = encLeft->adjustedValue - rps->lastEncLeft;
+		int rightDelta = encRight->adjustedValue - rps->lastEncRight;
+		float rad = rps->currentLoc->angle * MATH_PI/180;
+
+		if((leftDelta > 0 && rightDelta > 0) || (leftDelta < 0 && rightDelta < 0)) {
+			rps->currentLoc->xLeftRaw += leftDelta  * cos(rad);
+			rps->currentLoc->xRightRaw += rightDelta  * cos(rad);
+
+			rps->currentLoc->yLeftRaw += leftDelta  * sin(rad);
+			rps->currentLoc->yRightRaw += rightDelta  * sin(rad);
 		}
-		rps->lastEncLeft = encLeft;
-		rps->lastEncRight = encRight;
+
+		rps->currentLoc->x =
+//				((rps->currentLoc->xLeftRaw + rps->currentLoc->xRightRaw) / 2.0)
+				rps->currentLoc->xLeftRaw
+				/ encLeft->ticksPerRev * 4 * MATH_PI;
+		rps->currentLoc->y =
+//						((rps->currentLoc->yLeftRaw + rps->currentLoc->yRightRaw) / 2.0)
+				rps->currentLoc->yLeftRaw
+						/ encLeft->ticksPerRev * 4 * MATH_PI;
+
+		rps->lastEncLeft =  encLeft->adjustedValue;
+		rps->lastEncRight =  encRight->adjustedValue;
 	}
 }
 
@@ -543,6 +561,16 @@ void updateRicesensorAnalog(RicesensorAnalog *sen){
 			sen->value = analogRead(sen->port);
 		}
 	}
+}
+
+void saveLocation(Ricelocation *target, Ricelocation *source) {
+	target->angle = source->angle;
+	target->xLeftRaw = source->xLeftRaw;
+	target->xRightRaw = source->xRightRaw;
+	target->yLeftRaw = source->yLeftRaw;
+	target->yRightRaw = source->yRightRaw;
+	target->x = source->x;
+	target->y = source->y;
 }
 
 void resetRicencoder() {
@@ -857,6 +885,11 @@ void IOTask(void *ignore) {
 		for (int i = 1; i < AnalogVector->elem_current; i++) {
 			updateRicesensorAnalog(ricesensorAnalogVectorGet(AnalogVector, i));
 		}
+
+		if(rpsActive) {
+			updateRPS(rps, ENCDTLeft, ENCDTRight);
+		}
+
 		delay(10);
 	}
 }

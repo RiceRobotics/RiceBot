@@ -190,10 +190,12 @@ typedef struct RicepidStruct {
 
 //TODO: Finalize type and add docstring
 typedef struct RicelocationStruct {
-	int xRaw;
-	int yRaw;
-	int x;
-	int y;
+	float xLeftRaw;
+	float xRightRaw;
+	float yLeftRaw;
+	float yRightRaw;
+	float x;
+	float y;
 	int angle;
 } Ricelocation;
 
@@ -283,8 +285,8 @@ Ricepid* PidDefault;
 
 //Default Ricencoder
 Ricencoder* EncDefault;
-//Ricencoder* EncDTLeft;
-//Ricencoder* EncDTRight;
+Ricencoder* ENCDTLeft;
+Ricencoder* ENCDTRight;
 
 //Default Ricepot
 Ricepot* PotDefault;
@@ -505,11 +507,13 @@ void updateRicesolenoid(Ricesolenoid *rs);
 void updateRicebutton(Ricebutton *rb);
 
 //TODO
-void updateRPS(Ricerps *rps, int encLeft, int encRight);
+void updateRPS(Ricerps *rps, Ricencoder *encLeft, Ricencoder *encRight);
 
-void updateRicesensorDigital(RicesensorDigital *blah);
+void updateRicesensorDigital(RicesensorDigital *sen);
 
-void updateRicesensorAnalog(RicesensorAnalog *blahh);
+void updateRicesensorAnalog(RicesensorAnalog *sen);
+
+void saveLocation(Ricelocation *target, Ricelocation *source);
 
 void resetRicencoder();
 
